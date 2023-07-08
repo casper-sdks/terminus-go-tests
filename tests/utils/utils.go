@@ -23,11 +23,11 @@ var (
 
 func Sdk() casper.RPCClient {
 
-	host := fmt.Sprintf("%v", config["host-name"])
-	port := fmt.Sprintf("%v", config["port-rcp"])
-
-	var handler = casper.NewRPCHandler("http://"+host+":"+port+"/rpc", http.DefaultClient)
-	return casper.NewRPCClient(handler)
+	return casper.NewRPCClient(casper.NewRPCHandler(
+		fmt.Sprintf("http://%v:%v/rpc",
+			fmt.Sprintf("%v", config["host-name"]),
+			fmt.Sprintf("%v", config["port-rcp"])),
+		http.DefaultClient))
 
 }
 
@@ -74,6 +74,14 @@ type asserter struct {
 
 func (a *asserter) Errorf(format string, args ...interface{}) {
 	a.err = fmt.Errorf(format, args...)
+}
+
+func Result(err error) error {
+	if err != nil {
+		return err
+	} else {
+		return nil
+	}
 }
 
 type expectedAndActualAssertion func(t assert.TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool

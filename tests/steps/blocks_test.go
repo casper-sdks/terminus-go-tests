@@ -71,47 +71,28 @@ func InitializeScenarioBlocks(ctx *godog.ScenarioContext) {
 		err := utils.AssertExpectedAndActual(
 			assert.Equal, contextMap.blockDataSdk.Block.Body, contextMap.blockDataNode.Body,
 		)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return utils.Result(err)
 	})
 
 	ctx.Step(`^the hash of the returned block is equal to the hash of the returned test node block$`, func() error {
 		err := utils.AssertExpectedAndActual(
 			assert.Equal, contextMap.blockDataSdk.Block.Hash, contextMap.blockDataNode.Hash,
 		)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return utils.Result(err)
 	})
 
 	ctx.Step(`^the header of the returned block is equal to the header of the returned test node block$`, func() error {
 		err := utils.AssertExpectedAndActual(
 			assert.Equal, contextMap.blockDataSdk.Block.Header, contextMap.blockDataNode.Header,
 		)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return utils.Result(err)
 	})
 
 	ctx.Step(`^the proofs of the returned block are equal to the proofs of the returned test node block$`, func() error {
 		err := utils.AssertExpectedAndActual(
 			assert.Equal, contextMap.blockDataSdk.Block.Proofs, contextMap.blockDataNode.Proofs,
 		)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return utils.Result(err)
 	})
+
 }
