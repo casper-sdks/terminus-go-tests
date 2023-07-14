@@ -3,37 +3,16 @@ package steps
 import (
 	"context"
 	"github.com/cucumber/godog"
-	"github.com/make-software/casper-go-sdk/casper"
-	"github.com/make-software/casper-go-sdk/rpc"
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-type _map struct {
-	blockDataNode casper.Block
-	blockDataSdk  rpc.ChainGetBlockResult
-}
-
-var contextMap _map
-var t *testing.T
-
 func TestFeaturesBlocks(t *testing.T) {
-	suite := godog.TestSuite{
-		ScenarioInitializer: InitializeScenarioBlocks,
-		Options: &godog.Options{
-			Format:   "pretty",
-			Paths:    []string{"../features"},
-			TestingT: t, // Testing instance that will run subtests.
-		},
-	}
-
-	if suite.Run() != 0 {
-		t.Fatal("non-zero status returned, failed to run feature tests")
-	}
+	TestFeatures(t, "blocks.feature", InitializeBlocksScenario)
 }
 
-func InitializeScenarioBlocks(ctx *godog.ScenarioContext) {
+func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 
 	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
