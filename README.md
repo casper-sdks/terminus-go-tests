@@ -10,3 +10,12 @@ Points to note are:
 - Tests will run automatically on a push to main within the SDK repo
 - Tests can be run manually within this repos action tab
 - The tests are built using Cucumber features
+
+
+### To run the tests
+
+- install Go as per the instructions [here](https://go.dev/doc/install)
+- clone the github project
+- checkout the required branch
+- from root of the project, run 
+  - go test -v  tests/steps/*
