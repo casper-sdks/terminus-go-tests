@@ -33,7 +33,8 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that the latest block is requested via the sdk$`, func() error {
-		block, err := utils.Sdk().GetBlockLatest(context.Background())
+
+		block, err := utils.GetSdk().GetBlockLatest(context.Background())
 		if err != nil {
 			return err
 		}
@@ -43,7 +44,6 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 		contextMap.blockDataSdk = block
 
 		return nil
-
 	})
 
 	ctx.Step(`^the body of the returned block is equal to the body of the returned test node block$`, func() error {
@@ -73,5 +73,4 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 		)
 		return utils.Result(err)
 	})
-
 }

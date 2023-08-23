@@ -13,6 +13,7 @@ type _map struct {
 }
 
 var contextMap _map
+
 var t *testing.T
 
 func TestFeatures(t *testing.T, featureName string, scenarioInitializer func(*godog.ScenarioContext)) {

@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	yml "gopkg.in/yaml.v2"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -19,17 +18,8 @@ var (
 	_, b, _, _ = runtime.Caller(0)
 	root       = filepath.Join(filepath.Dir(b), "../..")
 	config     map[string]interface{}
+	Pass       error = nil
 )
-
-func Sdk() casper.RPCClient {
-
-	return casper.NewRPCClient(casper.NewRPCHandler(
-		fmt.Sprintf("http://%v:%v/rpc",
-			fmt.Sprintf("%v", config["host-name"]),
-			fmt.Sprintf("%v", config["port-rcp"])),
-		http.DefaultClient))
-
-}
 
 func ReadConfig() {
 	f, err := os.ReadFile(root + "/config.yml")

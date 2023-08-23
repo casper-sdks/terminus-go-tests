@@ -19,37 +19,34 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that a smart contract "([^"]*)" is located in the "([^"]*)" folder$`, func(wasmFileName string, contractsFolder string) error {
-		return nil
+		return godog.ErrPending
 	})
 
 	ctx.Step(`^the wasm is loaded as from the file system$`, func() error {
-		return nil
+		return godog.ErrPending
 	})
 
 	ctx.Step(`^the wasm has been successfully deployed$`, func() error {
-		return nil
+		return godog.ErrPending
 	})
 
-	ctx.Step(`^the account named keys contain the "([^"]*)" name$`,
-		func(name string) error {
-			return nil
-		},
-	)
+	ctx.Step(`^the account named keys contain the "([^"]*)" name$`, func(name string) error {
+		return godog.ErrPending
+	})
 
 	ctx.Step(`^the contract data "([^"]*)" is a "([^"]*)" with a value of "([^"]*)" and bytes of "([^"]*)"$`,
 		func(path string, typeName string, value string, hexBytes string) error {
-			return nil
+			return godog.ErrPending
 		},
 	)
 
 	ctx.Step(`^the contract entry point is invoked with a transfer amount of "([^"]*)"$`,
 		func(transferAmount string) error {
-			return nil
+			return godog.ErrPending
 		},
 	)
 
 	ctx.Step(`^the contract invocation deploy is successful$`, func() error {
-		return nil
+		return godog.ErrPending
 	})
-
 }
