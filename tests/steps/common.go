@@ -14,7 +14,7 @@ type _map struct {
 
 var contextMap _map
 
-var t *testing.T
+var CasperT *testing.T
 
 func TestFeatures(t *testing.T, featureName string, scenarioInitializer func(*godog.ScenarioContext)) {
 	suite := godog.TestSuite{
@@ -25,6 +25,8 @@ func TestFeatures(t *testing.T, featureName string, scenarioInitializer func(*go
 			TestingT: t, // Testing instance that will run subtests.
 		},
 	}
+
+	CasperT = t
 
 	if suite.Run() != 0 {
 		t.Fatal("non-zero status returned, failed to run feature tests")
