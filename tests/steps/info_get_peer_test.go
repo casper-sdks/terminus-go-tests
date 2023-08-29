@@ -33,18 +33,14 @@ func InitializeInfoGetPeers(ctx *godog.ScenarioContext) {
 
 		result, err := sdk.GetPeers(context.Background())
 
-		if err != nil {
-			return err
-		}
-
 		infoGetPeersResult = result
 
-		return utils.Pass
+		return err
 	})
 
 	ctx.Step(`^the node returns an info_get_peers_result`, func() error {
 
-		assert.NotNil(t, infoGetPeersResult, "infoGetPeersResult is nil")
+		assert.NotNil(CasperT, infoGetPeersResult, "infoGetPeersResult is nil")
 
 		return utils.Pass
 	})
@@ -67,7 +63,7 @@ func InitializeInfoGetPeers(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the info_get_peers_result contains a valid peer with a port number of (\d+)$`, func(portNumber int) error {
 
-		var found bool = false
+		var found = false
 
 		for i := 0; i < len(infoGetPeersResult.Peers); i++ {
 

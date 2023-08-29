@@ -20,12 +20,12 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^request the latest block via the test node$`, func() error {
-		err, block := utils.GetNctlLatestBlock()
+		block, err := utils.GetNctlLatestBlock()
 		if err != nil {
 			return err
 		}
 
-		assert.NotEmpty(t, block)
+		assert.NotEmpty(CasperT, block)
 
 		contextMap.blockDataNode = block
 
@@ -39,7 +39,7 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		assert.NotEmpty(t, block)
+		assert.NotEmpty(CasperT, block)
 
 		contextMap.blockDataSdk = block
 

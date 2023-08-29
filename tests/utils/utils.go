@@ -1,15 +1,11 @@
 package utils
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/acarl005/stripansi"
-	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/stretchr/testify/assert"
 	yml "gopkg.in/yaml.v2"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 )
@@ -30,26 +26,6 @@ func ReadConfig() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func GetNctlLatestBlock() (error, casper.Block) {
-
-	docker := fmt.Sprintf("%v", config["docker-name"])
-	block := casper.Block{}
-
-	res, err := exec.Command("/bin/sh", "-c",
-		"docker exec  -t "+docker+" /bin/bash -c 'source casper-node/utils/nctl/sh/views/view_chain_block.sh'",
-		"| sed -e \"s/\\x1b\\[.\\{1,5\\}m//g\"").Output()
-	if err != nil {
-		fmt.Println("could not run command: ", err)
-	}
-
-	err = json.Unmarshal([]byte(stripansi.Strip(string(res))), &block)
-	if err != nil {
-		fmt.Println("could not unmarshal: ", err)
-	}
-
-	return err, block
 }
 
 func AssertExpectedAndActual(a expectedAndActualAssertion, expected, actual interface{}) error {
