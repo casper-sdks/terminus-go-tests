@@ -23,26 +23,26 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		return ctx, nil
 	})
 
-	ctx.Step(`^Given that user-(\d+) initiates a transfer to user-(\d+)$`, func() error {
+	ctx.Step(`^that user-(\d+) initiates a transfer to user-(\d+)$`, func() error {
 
 		sdk.GetStateRootHashLatest(context.Background())
 
 		return utils.Pass
 	})
 
-	ctx.Step(`^the transfer amount is"([^"]*)"$`, func() error {
+	ctx.Step(`^the transfer amount is (\d+)$`, func(transferAmount int) error {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the transfer gas price is (\+d)$`, func(gasPrice int) error {
+	ctx.Step(`^the transfer gas price is (\d+)$`, func(gasPrice int) error {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the deploy is given a ttl of (\d+)$`, func(peercount int) error {
+	ctx.Step(`^the deploy is given a ttl of (\d+)m$`, func(peerCount int) error {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the deploy is put on chain "([^"]*)"$`, func(networkName string) error {
+	ctx.Step(`^the deploy is put on chain "([^"]*)"$`, func(chainName string) error {
 		return utils.Pass
 	})
 
@@ -54,19 +54,19 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		return utils.Pass
 	})
 
-	ctx.Step(`^that a Transfer has been successfully deployed$`, func(networkName string) error {
+	ctx.Step(`^that a Transfer has been successfully deployed$`, func() error {
 		return utils.Pass
 	})
 
-	ctx.Step(`^a deploy is requested via the info_get_deploy RCP method$`, func(networkName string) error {
+	ctx.Step(`^a deploy is requested via the info_get_deploy RCP method$`, func() error {
 		return utils.Pass
 	})
 
-	ctx.Step(`^ the deploy data has an API version of "([^"]*)"$`, func(networkName string) error {
+	ctx.Step(`^the deploy data has an API version of "([^"]*)"$`, func(apiVersion string) error {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the deploy execution result has "lastBlockAdded" block hash$`, func(networkName string) error {
+	ctx.Step(`^the deploy execution result has "([^"]*)" block hash$`, func(networkName string) error {
 		return utils.Pass
 	})
 
@@ -78,15 +78,15 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the deploy has a valid hash$`, func(networkName string) error {
+	ctx.Step(`^the deploy has a valid hash$`, func() error {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the deploy has a valid timestamp$`, func(networkName string) error {
+	ctx.Step(`^the deploy has a valid timestamp$`, func() error {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the deploy has a valid body hash$`, func(networkName string) error {
+	ctx.Step(`^the deploy has a valid body hash$`, func() error {
 		return utils.Pass
 	})
 
