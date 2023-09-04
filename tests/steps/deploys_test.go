@@ -2,6 +2,8 @@ package steps
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
@@ -121,6 +123,16 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		if err != nil {
 			return err
 		}
+
+		deployJson, err := json.Marshal(deploy)
+
+		if err != nil {
+			return err
+		}
+
+		assert.NotNil(CasperT, deployJson)
+
+		fmt.Print(string(deployJson))
 
 		result, err := sdk.PutDeploy(context.Background(), *deploy)
 
