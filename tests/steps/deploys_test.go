@@ -5,7 +5,7 @@ import (
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
-	types "github.com/make-software/casper-go-sdk/types"
+	"github.com/make-software/casper-go-sdk/types"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
 	"github.com/make-software/casper-go-sdk/types/keypair"
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
