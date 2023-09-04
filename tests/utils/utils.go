@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	_, b, _, _ = runtime.Caller(0)
-	root       = filepath.Join(filepath.Dir(b), "../..")
-	config     map[string]interface{}
-	Pass       error = nil
+	_, b, _, _        = runtime.Caller(0)
+	root              = filepath.Join(filepath.Dir(b), "../..")
+	config            map[string]interface{}
+	Pass              error = nil
+	NotImplementError       = fmt.Errorf("Not Implemented.")
 )
 
 func ReadConfig() {
@@ -51,3 +52,7 @@ func Result(err error) error {
 }
 
 type expectedAndActualAssertion func(t assert.TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool
+
+func GetUserKeyAssetPath(networkId int, userId int, keyFilename string) string {
+	return fmt.Sprintf("../../assets/net-%d/user-%d/%s", networkId, userId, keyFilename)
+}
