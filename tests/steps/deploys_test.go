@@ -20,7 +20,9 @@ import (
 	"time"
 )
 
-// The test features implementation for the info_get_peers.feature
+/**
+ * The test features implementation for the deploys.feature
+ */
 func TestFeaturesDeploys(t *testing.T) {
 	TestFeatures(t, "deploys.feature", InitializeDeploys)
 }
