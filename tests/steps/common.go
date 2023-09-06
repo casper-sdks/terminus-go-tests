@@ -4,6 +4,8 @@ import (
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
+	"log"
+	"os"
 	"testing"
 )
 
@@ -17,6 +19,15 @@ var contextMap _map
 var CasperT *testing.T
 
 func TestFeatures(t *testing.T, featureName string, scenarioInitializer func(*godog.ScenarioContext)) {
+
+	dir, err := os.Getwd()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Working dir: %s ", dir)
+
 	suite := godog.TestSuite{
 		ScenarioInitializer: scenarioInitializer,
 		Options: &godog.Options{
