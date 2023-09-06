@@ -5,13 +5,14 @@ go 1.20
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/cucumber/godog v0.12.6
-	github.com/make-software/casper-go-sdk v1.1.4
+	github.com/make-software/casper-go-sdk v1.3.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/sync v0.2.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

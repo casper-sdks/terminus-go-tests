@@ -22,10 +22,6 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 		return godog.ErrPending
 	})
 
-	ctx.Step(`^the wasm is loaded as from the file system$`, func() error {
-		return godog.ErrPending
-	})
-
 	ctx.Step(`^the wasm has been successfully deployed$`, func() error {
 		return godog.ErrPending
 	})
