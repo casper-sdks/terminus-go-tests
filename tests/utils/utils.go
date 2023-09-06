@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"testing"
 )
 
 var (
@@ -15,7 +16,7 @@ var (
 	root              = filepath.Join(filepath.Dir(b), "../..")
 	config            map[string]interface{}
 	Pass              error = nil
-	NotImplementError       = fmt.Errorf("Not Implemented.")
+	NotImplementError       = fmt.Errorf("not Implemented.")
 )
 
 func ReadConfig() {
@@ -55,4 +56,17 @@ type expectedAndActualAssertion func(t assert.TestingT, expected, actual interfa
 
 func GetUserKeyAssetPath(networkId int, userId int, keyFilename string) string {
 	return fmt.Sprintf("../../assets/net-%d/user-%d/%s", networkId, userId, keyFilename)
+}
+
+func ExpectEqual(t *testing.T, attribute string, actual any, expected any) error {
+
+	if !assert.Equal(t, expected, actual) {
+		return CreateExpectError(attribute, actual, expected)
+	} else {
+		return Pass
+	}
+}
+
+func CreateExpectError(attribute string, actual any, expected any) error {
+	return fmt.Errorf("%s expected %s to be %s", attribute, actual, expected)
 }

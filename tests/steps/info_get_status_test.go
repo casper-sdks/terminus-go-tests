@@ -66,45 +66,45 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the info_get_status_result has a valid last_added_block_info$`, func() error {
 
-		err := expectEqual("hash", infoGetStatusResult.LastAddedBlockInfo.Hash, nctlGetStatus.LastAddedBlockInfo.Hash)
+		err := utils.ExpectEqual(CasperT, "hash", infoGetStatusResult.LastAddedBlockInfo.Hash, nctlGetStatus.LastAddedBlockInfo.Hash)
 
 		if err == nil {
-			err = expectEqual("Timestamp", infoGetStatusResult.LastAddedBlockInfo.Timestamp, nctlGetStatus.LastAddedBlockInfo.Timestamp)
+			err = utils.ExpectEqual(CasperT, "Timestamp", infoGetStatusResult.LastAddedBlockInfo.Timestamp, nctlGetStatus.LastAddedBlockInfo.Timestamp)
 		}
 
 		if err == nil {
-			err = expectEqual("EraID", infoGetStatusResult.LastAddedBlockInfo.EraID, nctlGetStatus.LastAddedBlockInfo.EraID)
+			err = utils.ExpectEqual(CasperT, "EraID", infoGetStatusResult.LastAddedBlockInfo.EraID, nctlGetStatus.LastAddedBlockInfo.EraID)
 		}
 
 		if err == nil {
-			err = expectEqual("Height", infoGetStatusResult.LastAddedBlockInfo.Height, nctlGetStatus.LastAddedBlockInfo.Height)
+			err = utils.ExpectEqual(CasperT, "Height", infoGetStatusResult.LastAddedBlockInfo.Height, nctlGetStatus.LastAddedBlockInfo.Height)
 		}
 
 		if err == nil {
-			err = expectEqual("StateRootHash", infoGetStatusResult.LastAddedBlockInfo.StateRootHash, nctlGetStatus.LastAddedBlockInfo.StateRootHash)
+			err = utils.ExpectEqual(CasperT, "StateRootHash", infoGetStatusResult.LastAddedBlockInfo.StateRootHash, nctlGetStatus.LastAddedBlockInfo.StateRootHash)
 		}
 
 		if err == nil {
-			err = expectEqual("Creator", infoGetStatusResult.LastAddedBlockInfo.Creator, nctlGetStatus.LastAddedBlockInfo.Creator)
+			err = utils.ExpectEqual(CasperT, "Creator", infoGetStatusResult.LastAddedBlockInfo.Creator, nctlGetStatus.LastAddedBlockInfo.Creator)
 		}
 
 		return err
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid our_public_signing_key$`, func() error {
-		return expectEqual("our_public_signing_key", infoGetStatusResult.OutPublicSigningKey, nctlGetStatus.OutPublicSigningKey)
+		return utils.ExpectEqual(CasperT, "our_public_signing_key", infoGetStatusResult.OutPublicSigningKey, nctlGetStatus.OutPublicSigningKey)
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid starting_state_root_hash$`, func() error {
-		return expectEqual("StartingStateRootHash", infoGetStatusResult.StartingStateRootHash, nctlGetStatus.StartingStateRootHash)
+		return utils.ExpectEqual(CasperT, "StartingStateRootHash", infoGetStatusResult.StartingStateRootHash, nctlGetStatus.StartingStateRootHash)
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid build_version$`, func() error {
-		return expectEqual("BuildVersion", infoGetStatusResult.BuildVersion, nctlGetStatus.BuildVersion)
+		return utils.ExpectEqual(CasperT, "BuildVersion", infoGetStatusResult.BuildVersion, nctlGetStatus.BuildVersion)
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid round_length$`, func() error {
-		return expectEqual("RoundLength", infoGetStatusResult.RoundLength, nctlGetStatus.RoundLength)
+		return utils.ExpectEqual(CasperT, "RoundLength", infoGetStatusResult.RoundLength, nctlGetStatus.RoundLength)
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid uptime$`, func() error {
@@ -117,14 +117,6 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid peers$`, func() error {
-		return expectEqual("Peers", infoGetStatusResult.Peers, nctlGetStatus.Peers)
+		return utils.ExpectEqual(CasperT, "Peers", infoGetStatusResult.Peers, nctlGetStatus.Peers)
 	})
-}
-
-func expectEqual(attribute string, actual any, expected any) error {
-
-	if !assert.Equal(CasperT, expected, actual) {
-		return fmt.Errorf("%s expected %s to be %s", attribute, actual, expected)
-	}
-	return utils.Pass
 }
