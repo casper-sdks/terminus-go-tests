@@ -4,6 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/big"
+	"math/rand"
+	"testing"
+	"time"
+
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
@@ -12,12 +17,9 @@ import (
 	"github.com/make-software/casper-go-sdk/types/clvalue"
 	"github.com/make-software/casper-go-sdk/types/clvalue/cltype"
 	"github.com/make-software/casper-go-sdk/types/keypair"
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 	"github.com/stretchr/testify/assert"
-	"math/big"
-	"math/rand"
-	"testing"
-	"time"
+
+	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 /**
@@ -27,12 +29,13 @@ func TestFeaturesDeploys(t *testing.T) {
 	TestFeatures(t, "deploys.feature", InitializeDeploys)
 }
 
-var putDeployResult rpc.PutDeployResult
-var infoGetDeployResult casper.InfoGetDeployResult
-var blockHash string
+var (
+	putDeployResult     rpc.PutDeployResult
+	infoGetDeployResult casper.InfoGetDeployResult
+	blockHash           string
+)
 
 func InitializeDeploys(ctx *godog.ScenarioContext) {
-
 	var sdk casper.RPCClient
 	var senderKey keypair.PrivateKey
 	var receiverKey keypair.PublicKey
@@ -46,7 +49,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that user-(\d+) initiates a transfer to user-(\d+)$`, func(senderId int, receiverId int) error {
-
 		err := utils.Pass
 
 		keyPath := utils.GetUserKeyAssetPath(1, senderId, "secret_key.pem")
@@ -74,7 +76,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the transfer amount is (\d+)$`, func(amount int64) error {
-
 		transferAmount = big.NewInt(amount)
 
 		assert.NotNil(CasperT, transferAmount, "transferPrice")
@@ -83,7 +84,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the transfer gas price is (\d+)$`, func(price int) error {
-
 		gasPrice = price
 
 		assert.NotNil(CasperT, gasPrice, "gasPrice")
@@ -92,12 +92,10 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy is given a ttl of (\d+)m$`, func(ttl int) error {
-
 		return utils.Pass
 	})
 
 	ctx.Step(`^the deploy is put on chain "([^"]*)"$`, func(chainName string) error {
-
 		assert.NotNil(CasperT, chainName, "chainName")
 
 		header := types.DefaultHeader()
@@ -118,7 +116,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		}
 
 		deploy, err := types.MakeDeploy(header, payment, session)
-
 		if err != nil {
 			return err
 		}
@@ -132,7 +129,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		}
 
 		deployJson, err := json.Marshal(deploy)
-
 		if err != nil {
 			return err
 		}
@@ -142,7 +138,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		fmt.Println(string(deployJson))
 
 		result, err := sdk.PutDeploy(context.Background(), *deploy)
-
 		if err != nil {
 			return err
 		}
@@ -153,7 +148,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy response contains a valid deploy hash of length (\d+) and an API version "([^"]*)"$`, func(hashLength int, apiVersion string) error {
-
 		err := utils.Pass
 		assert.NotNil(CasperT, putDeployResult, "PutDeployResult")
 
@@ -167,8 +161,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^wait for a block added event with a timeout of (\d+) seconds$`, func(timeoutSeconds int) error {
-
-		var err = utils.Pass
+		err := utils.Pass
 		var blockAddedEvent sse.BlockAddedEvent
 		blockAddedEvent, err = utils.WaitForBlockAdded(putDeployResult.DeployHash.String(), timeoutSeconds)
 
@@ -181,7 +174,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that a Transfer has been successfully deployed$`, func() error {
-		var err = utils.Pass
+		err := utils.Pass
 
 		if infoGetDeployResult.Deploy.Hash.String() != putDeployResult.DeployHash.String() {
 			err = fmt.Errorf("deploy does not match hash %s", putDeployResult.DeployHash.String())
@@ -199,7 +192,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy data has an API version of "([^"]*)"$`, func(apiVersion string) error {
-
 		return utils.ExpectEqual(CasperT, "apiVersion", infoGetDeployResult.ApiVersion, apiVersion)
 	})
 
@@ -212,7 +204,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy has a payment amount of (\d+)$`, func(payment int64) error {
-
 		amount, err := infoGetDeployResult.Deploy.Payment.ModuleBytes.Args.Find("amount")
 		if err != nil {
 			return err
@@ -220,7 +211,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 
 		// ERROR the SDK only provides the named argument bytes it has not deserialized named arguments name or value fields
 		value, err := amount.Value()
-
 		if err != nil {
 			return err
 		}
@@ -232,7 +222,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		}
 
 		return utils.ExpectEqual(CasperT, "value", *value.UI512.Value(), *big.NewInt(payment))
-
 	})
 
 	ctx.Step(`^the deploy has a valid hash$`, func() error {
