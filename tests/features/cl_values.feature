@@ -61,6 +61,3 @@ Feature: CL Values
     #And the deploys NamedArgument Complex value "Tuple3" has internal types of "String,U32,Bool" and values of "ACME,10000,false" and bytes of "0400000041434d451027000000"
     #And the deploys NamedArgument Complex value "List" has internal types of "String,String,String,String,String" and values of "Alpha,Beta,Gama,Delta,Epsilon" and bytes of "0500000005000000416c70686104000000426574610400000047616d610500000044656c746107000000457073696c6f6e"
     #And the deploys NamedArgument Complex value "Map" has internal types of "String,String,String" and values of "ACME,20000,true" and bytes of "0300000001000000300400000041434d45010000003105000000323030303001000000320400000074727565"
-
-
-

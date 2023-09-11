@@ -23,7 +23,7 @@ import (
 )
 
 /**
- * The test features implementation for the deploys.feature
+ * The test features implementation for the cl_values.feature
  */
 func TestClValues(t *testing.T) {
 	TestFeatures(t, "cl_values.feature", InitializeClValues)
@@ -59,13 +59,14 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 		return err
 	})
 
-	ctx.Step(`^that the CL complex value of type "([^"]*)" with an internal types of "([^"]*)" values of "([^"]*)"$`, func(typeName string, internalTypes string, values string) error {
+	ctx.Step(`^that the CL complex value of type "([^"]*)" with an internal types of "([^"]*)" values of "([^"]*)"$`,
+		func(typeName string, internalTypes string, values string) error {
 
-		clVal, err := utils.CreateComplexValue(typeName, strings.Split(internalTypes, ","), strings.Split(values, ","))
-		testArgs.AddArgument(typeName, *clVal)
-		lastVal = *clVal
-		return err
-	})
+			clVal, err := utils.CreateComplexValue(typeName, strings.Split(internalTypes, ","), strings.Split(values, ","))
+			testArgs.AddArgument(typeName, *clVal)
+			lastVal = *clVal
+			return err
+		})
 
 	ctx.Step(`^the values are added as arguments to a deploy$`, func() error {
 
@@ -101,6 +102,7 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 			}
 			args.AddArgument(name, val)
 		}
+
 		session := types.ExecutableDeployItem{
 			Transfer: &types.TransferDeployItem{
 				Args: *args,
