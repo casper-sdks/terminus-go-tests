@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
+	"github.com/make-software/casper-go-sdk/types/clvalue/cltype"
 	"github.com/make-software/casper-go-sdk/types/key"
 	"math/big"
 	"strconv"
@@ -93,11 +94,79 @@ func CreateValue(typeName string, strValue string) (*clvalue.CLValue, error) {
 		bytes, err = hex.DecodeString(strValue)
 		uRef, err = key.NewURefFromBytes(bytes)
 		if err == nil {
-			clVal = clvalue.NewCLUref(uRef)
+			clvalue.NewCLUref(uRef)
 		}
 
 	default:
-		err = fmt.Errorf("invalid type %s or value %s", typeName, strValue)
+		err = fmt.Errorf("invalid type %s for value %s", typeName, strValue)
 	}
 	return &clVal, err
+}
+
+func CreateComplexValue(typeName string, innerTypes []string, strValues []string) (*clvalue.CLValue, error) {
+	var clVal = clvalue.CLValue{}
+	var innerValues []clvalue.CLValue
+
+	var err error = nil
+	innerValues, err = createInnerValues(strValues, innerTypes)
+	if err != nil {
+		return nil, err
+	}
+
+	switch typeName {
+	case "Option":
+		clVal = clvalue.NewCLOption(innerValues[0])
+
+	case "Tuple1":
+		clVal = clvalue.NewCLTuple1(innerValues[0])
+
+	case "Tuple2":
+		clVal = clvalue.NewCLTuple2(innerValues[0], innerValues[1])
+
+	case "Tuple3":
+		clVal = clvalue.NewCLTuple3(innerValues[0], innerValues[1], innerValues[2])
+
+	case "List":
+		clList := clvalue.NewCLList(innerValues[0].Type)
+		for _, innerValue := range innerValues {
+			clList.List.Append(clvalue.NewCLByteArray(innerValue.Bytes()))
+		}
+		clVal = clList
+
+	case "Map":
+		clMap := clvalue.NewCLMap(cltype.String, cltype.String)
+		var mapKey *clvalue.CLValue
+		for i, innerValue := range innerValues {
+			formatInt := strconv.FormatInt(int64(i), 10)
+			mapKey, err = CreateValue("String", formatInt)
+			if err != nil {
+				break
+			}
+			err = clMap.Map.Append(*mapKey, innerValue)
+			if err != nil {
+				break
+			}
+		}
+		clVal = clMap
+
+	default:
+		err = fmt.Errorf("invalid type %s with innerTypes %s and values %s", typeName, innerTypes, strValues)
+	}
+
+	return &clVal, err
+}
+
+func createInnerValues(strValues []string, innerTypes []string) ([]clvalue.CLValue, error) {
+
+	var innerValues []clvalue.CLValue
+
+	for i, innerValue := range strValues {
+		innerType := innerTypes[i]
+		value, err := CreateValue(innerType, innerValue)
+		if err != nil {
+			return nil, err
+		}
+		innerValues = append(innerValues, *value)
+	}
+	return innerValues, nil
 }
