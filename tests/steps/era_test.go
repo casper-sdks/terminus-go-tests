@@ -12,6 +12,7 @@ import (
 	"testing"
 )
 
+// Step Definitions for the eras.feature
 func TestFeaturesEra(t *testing.T) {
 	utils.TestFeatures(t, "era.feature", InitializeEraFeature)
 }
