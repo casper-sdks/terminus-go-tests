@@ -13,7 +13,7 @@ import (
 
 // The test features implementation for the info_get_validator_changes.feature
 func TestFeaturesInfoGetValidatorChanges(t *testing.T) {
-	TestFeatures(t, "info_get_validator_changes.feature", InitializeInfoGetValidatorChanges)
+	utils.TestFeatures(t, "info_get_validator_changes.feature", InitializeInfoGetValidatorChanges)
 }
 
 func InitializeInfoGetValidatorChanges(ctx *godog.ScenarioContext) {
@@ -38,9 +38,9 @@ func InitializeInfoGetValidatorChanges(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^a valid info_get_validator_changes_result is returned$`, func() error {
 
-		assert.NotNil(CasperT, validatorChanges, "validatorChanges is nil")
+		assert.NotNil(utils.CasperT, validatorChanges, "validatorChanges is nil")
 
-		assert.NotNil(CasperT, validatorChanges.Changes)
+		assert.NotNil(utils.CasperT, validatorChanges.Changes)
 
 		// TODO need to investigate how to ensure changes exist as we have none on nctl startup
 

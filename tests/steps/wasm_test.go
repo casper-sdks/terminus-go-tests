@@ -8,7 +8,7 @@ import (
 )
 
 func TestFeaturesWasm(t *testing.T) {
-	TestFeatures(t, "wasm.feature", InitializeWasmFeature)
+	utils.TestFeatures(t, "wasm.feature", InitializeWasmFeature)
 }
 
 func InitializeWasmFeature(ctx *godog.ScenarioContext) {

@@ -1,3 +1,14 @@
 #!/usr/bin/env bash
 cd "$(dirname "$0")/.." || exit 1
-go test -v tests/steps/*
+
+# The first parameter can be the name of a single go file to execute in the steps package if not present all test will
+# execute. eg: "./script/test cl_values_test.go" will only execute the cl_values_test.go test
+if [ -z "$1" ]
+then
+  # Runs all tests
+  TEST_STEP="*"
+else
+  # Runs the test specified in $1
+  TEST_STEP="$1"
+fi
+go test -v tests/steps/$TEST_STEP

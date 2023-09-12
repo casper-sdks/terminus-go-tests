@@ -14,7 +14,7 @@ import (
 
 // The test features implementation for the info_get_peers.feature
 func TestFeaturesInfoGetStatus(t *testing.T) {
-	TestFeatures(t, "info_get_status.feature", InitializeInfoGetStatus)
+	utils.TestFeatures(t, "info_get_status.feature", InitializeInfoGetStatus)
 }
 
 func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
@@ -42,7 +42,7 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^an info_get_status_result is returned`, func() error {
 
-		assert.NotNil(CasperT, infoGetStatusResult, "infoGetStatusResult is nil")
+		assert.NotNil(utils.CasperT, infoGetStatusResult, "infoGetStatusResult is nil")
 
 		return utils.Pass
 	})
@@ -66,45 +66,45 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the info_get_status_result has a valid last_added_block_info$`, func() error {
 
-		err := utils.ExpectEqual(CasperT, "hash", infoGetStatusResult.LastAddedBlockInfo.Hash, nctlGetStatus.LastAddedBlockInfo.Hash)
+		err := utils.ExpectEqual(utils.CasperT, "hash", infoGetStatusResult.LastAddedBlockInfo.Hash, nctlGetStatus.LastAddedBlockInfo.Hash)
 
 		if err == nil {
-			err = utils.ExpectEqual(CasperT, "Timestamp", infoGetStatusResult.LastAddedBlockInfo.Timestamp, nctlGetStatus.LastAddedBlockInfo.Timestamp)
+			err = utils.ExpectEqual(utils.CasperT, "Timestamp", infoGetStatusResult.LastAddedBlockInfo.Timestamp, nctlGetStatus.LastAddedBlockInfo.Timestamp)
 		}
 
 		if err == nil {
-			err = utils.ExpectEqual(CasperT, "EraID", infoGetStatusResult.LastAddedBlockInfo.EraID, nctlGetStatus.LastAddedBlockInfo.EraID)
+			err = utils.ExpectEqual(utils.CasperT, "EraID", infoGetStatusResult.LastAddedBlockInfo.EraID, nctlGetStatus.LastAddedBlockInfo.EraID)
 		}
 
 		if err == nil {
-			err = utils.ExpectEqual(CasperT, "Height", infoGetStatusResult.LastAddedBlockInfo.Height, nctlGetStatus.LastAddedBlockInfo.Height)
+			err = utils.ExpectEqual(utils.CasperT, "Height", infoGetStatusResult.LastAddedBlockInfo.Height, nctlGetStatus.LastAddedBlockInfo.Height)
 		}
 
 		if err == nil {
-			err = utils.ExpectEqual(CasperT, "StateRootHash", infoGetStatusResult.LastAddedBlockInfo.StateRootHash, nctlGetStatus.LastAddedBlockInfo.StateRootHash)
+			err = utils.ExpectEqual(utils.CasperT, "StateRootHash", infoGetStatusResult.LastAddedBlockInfo.StateRootHash, nctlGetStatus.LastAddedBlockInfo.StateRootHash)
 		}
 
 		if err == nil {
-			err = utils.ExpectEqual(CasperT, "Creator", infoGetStatusResult.LastAddedBlockInfo.Creator, nctlGetStatus.LastAddedBlockInfo.Creator)
+			err = utils.ExpectEqual(utils.CasperT, "Creator", infoGetStatusResult.LastAddedBlockInfo.Creator, nctlGetStatus.LastAddedBlockInfo.Creator)
 		}
 
 		return err
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid our_public_signing_key$`, func() error {
-		return utils.ExpectEqual(CasperT, "our_public_signing_key", infoGetStatusResult.OutPublicSigningKey, nctlGetStatus.OutPublicSigningKey)
+		return utils.ExpectEqual(utils.CasperT, "our_public_signing_key", infoGetStatusResult.OutPublicSigningKey, nctlGetStatus.OutPublicSigningKey)
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid starting_state_root_hash$`, func() error {
-		return utils.ExpectEqual(CasperT, "StartingStateRootHash", infoGetStatusResult.StartingStateRootHash, nctlGetStatus.StartingStateRootHash)
+		return utils.ExpectEqual(utils.CasperT, "StartingStateRootHash", infoGetStatusResult.StartingStateRootHash, nctlGetStatus.StartingStateRootHash)
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid build_version$`, func() error {
-		return utils.ExpectEqual(CasperT, "BuildVersion", infoGetStatusResult.BuildVersion, nctlGetStatus.BuildVersion)
+		return utils.ExpectEqual(utils.CasperT, "BuildVersion", infoGetStatusResult.BuildVersion, nctlGetStatus.BuildVersion)
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid round_length$`, func() error {
-		return utils.ExpectEqual(CasperT, "RoundLength", infoGetStatusResult.RoundLength, nctlGetStatus.RoundLength)
+		return utils.ExpectEqual(utils.CasperT, "RoundLength", infoGetStatusResult.RoundLength, nctlGetStatus.RoundLength)
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid uptime$`, func() error {
@@ -117,6 +117,6 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid peers$`, func() error {
-		return utils.ExpectEqual(CasperT, "Peers", infoGetStatusResult.Peers, nctlGetStatus.Peers)
+		return utils.ExpectEqual(utils.CasperT, "Peers", infoGetStatusResult.Peers, nctlGetStatus.Peers)
 	})
 }

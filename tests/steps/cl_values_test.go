@@ -26,7 +26,7 @@ import (
  * The test features implementation for the cl_values.feature
  */
 func TestClValues(t *testing.T) {
-	TestFeatures(t, "cl_values.feature", InitializeClValues)
+	utils.TestFeatures(t, "cl_values.feature", InitializeClValues)
 }
 
 func InitializeClValues(ctx *godog.ScenarioContext) {
@@ -114,7 +114,7 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		assert.NotNil(CasperT, clValuesDeploy, "deploy")
+		assert.NotNil(utils.CasperT, clValuesDeploy, "deploy")
 
 		err = clValuesDeploy.SignDeploy(senderKey)
 
@@ -127,7 +127,7 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		assert.NotNil(CasperT, deployJson)
+		assert.NotNil(utils.CasperT, deployJson)
 
 		fmt.Println(string(deployJson))
 
@@ -143,7 +143,7 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the deploy response contains a valid deploy hash of length (\d+) and an API version "([^"]*)"$`, func(hashLength int, apiVersion string) error {
 
-		err := utils.ExpectEqual(CasperT, "API", clValuesDeployResult.ApiVersion, apiVersion)
+		err := utils.ExpectEqual(utils.CasperT, "API", clValuesDeployResult.ApiVersion, apiVersion)
 		return err
 	})
 
@@ -178,9 +178,9 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 			var value clvalue.CLValue
 			value, err = arg.Value()
 
-			err = utils.ExpectEqual(CasperT, "value", value.GetValueByType(), expectedValue.GetValueByType())
+			err = utils.ExpectEqual(utils.CasperT, "value", value.GetValueByType(), expectedValue.GetValueByType())
 			if err == nil {
-				err = utils.ExpectEqual(CasperT, "bytes", hex.EncodeToString(value.Bytes()), hexBytes)
+				err = utils.ExpectEqual(utils.CasperT, "bytes", hex.EncodeToString(value.Bytes()), hexBytes)
 			}
 		}
 		return err
@@ -194,13 +194,13 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 			value, err = arg.Value()
 
 			if err == nil {
-				err = utils.ExpectEqual(CasperT, "bytes", hex.EncodeToString(value.Bytes()), hexBytes)
+				err = utils.ExpectEqual(utils.CasperT, "bytes", hex.EncodeToString(value.Bytes()), hexBytes)
 			}
 
 			var expectedValue *clvalue.CLValue
 			expectedValue, err = utils.CreateComplexValue(name, strings.Split(internalTypes, ","), strings.Split(values, ","))
 			if err == nil {
-				err = utils.ExpectEqual(CasperT, "value", value.GetValueByType().String(), expectedValue.GetValueByType().String())
+				err = utils.ExpectEqual(utils.CasperT, "value", value.GetValueByType().String(), expectedValue.GetValueByType().String())
 			}
 			return err
 		})

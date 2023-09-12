@@ -26,7 +26,7 @@ import (
  * The test features implementation for the deploys.feature
  */
 func TestFeaturesDeploys(t *testing.T) {
-	TestFeatures(t, "deploys.feature", InitializeDeploys)
+	utils.TestFeatures(t, "deploys.feature", InitializeDeploys)
 }
 
 var (
@@ -59,18 +59,18 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		assert.NotNil(CasperT, senderKey, "senderKey is nil")
+		assert.NotNil(utils.CasperT, senderKey, "senderKey is nil")
 
 		keyPath = utils.GetUserKeyAssetPath(1, receiverId, "secret_key.pem")
 
 		var receiverPrivateKey keypair.PrivateKey
 		receiverPrivateKey, err = casper.NewED25519PrivateKeyFromPEMFile(keyPath)
 
-		assert.NotNil(CasperT, receiverPrivateKey, "receiverPrivateKey is nil")
+		assert.NotNil(utils.CasperT, receiverPrivateKey, "receiverPrivateKey is nil")
 
 		receiverKey = receiverPrivateKey.PublicKey()
 
-		assert.NotNil(CasperT, receiverKey, "receiverKey is nil")
+		assert.NotNil(utils.CasperT, receiverKey, "receiverKey is nil")
 
 		return err
 	})
@@ -78,7 +78,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the transfer amount is (\d+)$`, func(amount int64) error {
 		transferAmount = big.NewInt(amount)
 
-		assert.NotNil(CasperT, transferAmount, "transferPrice")
+		assert.NotNil(utils.CasperT, transferAmount, "transferPrice")
 
 		return utils.Pass
 	})
@@ -86,7 +86,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the transfer gas price is (\d+)$`, func(price int) error {
 		gasPrice = price
 
-		assert.NotNil(CasperT, gasPrice, "gasPrice")
+		assert.NotNil(utils.CasperT, gasPrice, "gasPrice")
 
 		return utils.Pass
 	})
@@ -96,7 +96,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy is put on chain "([^"]*)"$`, func(chainName string) error {
-		assert.NotNil(CasperT, chainName, "chainName")
+		assert.NotNil(utils.CasperT, chainName, "chainName")
 
 		header := types.DefaultHeader()
 		header.ChainName = chainName
@@ -120,7 +120,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		assert.NotNil(CasperT, deploy, "deploy")
+		assert.NotNil(utils.CasperT, deploy, "deploy")
 
 		err = deploy.SignDeploy(senderKey)
 
@@ -133,7 +133,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		assert.NotNil(CasperT, deployJson)
+		assert.NotNil(utils.CasperT, deployJson)
 
 		fmt.Println(string(deployJson))
 
@@ -149,12 +149,12 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the deploy response contains a valid deploy hash of length (\d+) and an API version "([^"]*)"$`, func(hashLength int, apiVersion string) error {
 		err := utils.Pass
-		assert.NotNil(CasperT, putDeployResult, "PutDeployResult")
+		assert.NotNil(utils.CasperT, putDeployResult, "PutDeployResult")
 
-		err = utils.ExpectEqual(CasperT, "putDeployResult.DeployHash", len(putDeployResult.DeployHash.String()), hashLength)
+		err = utils.ExpectEqual(utils.CasperT, "putDeployResult.DeployHash", len(putDeployResult.DeployHash.String()), hashLength)
 
 		if err == nil {
-			err = utils.ExpectEqual(CasperT, "putDeployResult.ApiVersion", putDeployResult.ApiVersion, apiVersion)
+			err = utils.ExpectEqual(utils.CasperT, "putDeployResult.ApiVersion", putDeployResult.ApiVersion, apiVersion)
 		}
 
 		return err
@@ -192,15 +192,15 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy data has an API version of "([^"]*)"$`, func(apiVersion string) error {
-		return utils.ExpectEqual(CasperT, "apiVersion", infoGetDeployResult.ApiVersion, apiVersion)
+		return utils.ExpectEqual(utils.CasperT, "apiVersion", infoGetDeployResult.ApiVersion, apiVersion)
 	})
 
 	ctx.Step(`^the deploy execution result has "([^"]*)" block hash$`, func(blockName string) error {
-		return utils.ExpectEqual(CasperT, "blockHash", infoGetDeployResult.ExecutionResults[0].BlockHash.String(), blockHash)
+		return utils.ExpectEqual(utils.CasperT, "blockHash", infoGetDeployResult.ExecutionResults[0].BlockHash.String(), blockHash)
 	})
 
 	ctx.Step(`^the deploy execution has a cost of (\d+) motes$`, func(cost int64) error {
-		return utils.ExpectEqual(CasperT, "cost", infoGetDeployResult.ExecutionResults[0].Result.Success.Cost, uint64(cost))
+		return utils.ExpectEqual(utils.CasperT, "cost", infoGetDeployResult.ExecutionResults[0].Result.Success.Cost, uint64(cost))
 	})
 
 	ctx.Step(`^the deploy has a payment amount of (\d+)$`, func(payment int64) error {
@@ -215,13 +215,13 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		err = utils.ExpectEqual(CasperT, "value type", value.Type.GetTypeID(), cltype.UInt512)
+		err = utils.ExpectEqual(utils.CasperT, "value type", value.Type.GetTypeID(), cltype.UInt512)
 
 		if err != nil {
 			return err
 		}
 
-		return utils.ExpectEqual(CasperT, "value", *value.UI512.Value(), *big.NewInt(payment))
+		return utils.ExpectEqual(utils.CasperT, "value", *value.UI512.Value(), *big.NewInt(payment))
 	})
 
 	ctx.Step(`^the deploy has a valid hash$`, func() error {

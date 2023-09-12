@@ -3,13 +3,22 @@ package steps
 import (
 	"context"
 	"github.com/cucumber/godog"
+	"github.com/make-software/casper-go-sdk/casper"
+	"github.com/make-software/casper-go-sdk/rpc"
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
+type _map struct {
+	blockDataNode casper.Block
+	blockDataSdk  rpc.ChainGetBlockResult
+}
+
+var contextMap _map
+
 func TestFeaturesBlocks(t *testing.T) {
-	TestFeatures(t, "blocks.feature", InitializeBlocksScenario)
+	utils.TestFeatures(t, "blocks.feature", InitializeBlocksScenario)
 }
 
 func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
@@ -25,7 +34,7 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		assert.NotEmpty(CasperT, block)
+		assert.NotEmpty(utils.CasperT, block)
 
 		contextMap.blockDataNode = block
 
@@ -39,7 +48,7 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		assert.NotEmpty(CasperT, block)
+		assert.NotEmpty(utils.CasperT, block)
 
 		contextMap.blockDataSdk = block
 
