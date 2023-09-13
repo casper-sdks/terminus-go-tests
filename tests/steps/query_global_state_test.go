@@ -188,7 +188,6 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 
 		return utils.Pass
 	})
-
 }
 
 func getRpcError(err interface{}) rpc.RpcError {
@@ -216,7 +215,6 @@ func createTransfer(sdk casper.RPCClient) (rpc.PutDeployResult, error) {
 	keyPath = utils.GetUserKeyAssetPath(1, 2, "secret_key.pem")
 	receiverKey, err = casper.NewED25519PrivateKeyFromPEMFile(keyPath)
 	if err != nil {
-
 		log.Fatal(err)
 	}
 
