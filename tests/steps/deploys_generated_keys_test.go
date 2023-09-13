@@ -27,7 +27,7 @@ const SECP256K1 = "Secp256k1"
 
 // The test features implementation for the deploys_generated_keys.feature
 func TestFeaturesGeneratedKeys(t *testing.T) {
-	TestFeatures(t, "deploys_generated_keys.feature", InitializeGeneratedKeys)
+	utils.TestFeatures(t, "deploys_generated_keys.feature", InitializeGeneratedKeys)
 }
 
 func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
@@ -143,13 +143,13 @@ func doDeploy(sdk casper.RPCClient,
 	deploy, err := types.MakeDeploy(header, stdPayment, session)
 
 	if err == nil {
-		assert.NotNil(CasperT, deploy, "deploy")
+		assert.NotNil(utils.CasperT, deploy, "deploy")
 		err = deploy.SignDeploy(faucet)
 	}
 
 	if err == nil {
 		deployJson, err = json.Marshal(deploy)
-		assert.NotNil(CasperT, deployJson)
+		assert.NotNil(utils.CasperT, deployJson)
 		fmt.Println(string(deployJson))
 	}
 

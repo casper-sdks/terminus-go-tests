@@ -1,20 +1,11 @@
-package steps
+package utils
 
 import (
 	"github.com/cucumber/godog"
-	"github.com/make-software/casper-go-sdk/casper"
-	"github.com/make-software/casper-go-sdk/rpc"
 	"log"
 	"os"
 	"testing"
 )
-
-type _map struct {
-	blockDataNode casper.Block
-	blockDataSdk  rpc.ChainGetBlockResult
-}
-
-var contextMap _map
 
 var CasperT *testing.T
 

@@ -8,7 +8,7 @@ import (
 )
 
 func TestFeaturesWasm(t *testing.T) {
-	TestFeatures(t, "wasm.feature", InitializeWasmFeature)
+	utils.TestFeatures(t, "wasm.feature", InitializeWasmFeature)
 }
 
 func InitializeWasmFeature(ctx *godog.ScenarioContext) {
@@ -18,7 +18,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 		return ctx, nil
 	})
 
-	ctx.Step(`^that a smart contract "([^"]*)" is located in the "([^"]*)" folder$`, func(wasmFileName string, contractsFolder string) error {
+	ctx.Step(`^t$`, func(wasmFileName string, contractsFolder string) error {
 		return godog.ErrPending
 	})
 

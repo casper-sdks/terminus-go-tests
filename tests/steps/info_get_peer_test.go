@@ -15,7 +15,7 @@ import (
 
 // The test features implementation for the info_get_peers.feature
 func TestFeaturesInfoGetPeer(t *testing.T) {
-	TestFeatures(t, "info_get_peer.feature", InitializeInfoGetPeers)
+	utils.TestFeatures(t, "info_get_peer.feature", InitializeInfoGetPeers)
 }
 
 func InitializeInfoGetPeers(ctx *godog.ScenarioContext) {
@@ -40,7 +40,7 @@ func InitializeInfoGetPeers(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the node returns an info_get_peers_result`, func() error {
 
-		assert.NotNil(CasperT, infoGetPeersResult, "infoGetPeersResult is nil")
+		assert.NotNil(utils.CasperT, infoGetPeersResult, "infoGetPeersResult is nil")
 
 		return utils.Pass
 	})
