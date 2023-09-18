@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cucumber/godog"
-	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/types"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
@@ -25,15 +24,10 @@ func TestFeaturesReadDeploy(t *testing.T) {
 
 func InitializeReadDeploy(ctx *godog.ScenarioContext) {
 
-	var sdk casper.RPCClient
 	var deploy types.Deploy
 
 	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
-		sdk = utils.GetSdk()
-		if sdk == nil {
-
-		}
 		return ctx, nil
 	})
 

@@ -3,6 +3,7 @@ package steps
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"math/rand"
@@ -33,11 +34,13 @@ var (
 	putDeployResult     rpc.PutDeployResult
 	infoGetDeployResult casper.InfoGetDeployResult
 	blockHash           string
+	putDeploy           casper.Deploy
+	senderKey           keypair.PrivateKey
+	receiverPrivateKey  keypair.PrivateKey
 )
 
 func InitializeDeploys(ctx *godog.ScenarioContext) {
 	var sdk casper.RPCClient
-	var senderKey keypair.PrivateKey
 	var receiverKey keypair.PublicKey
 	var transferAmount *big.Int
 	var gasPrice int
@@ -63,7 +66,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 
 		keyPath = utils.GetUserKeyAssetPath(1, receiverId, "secret_key.pem")
 
-		var receiverPrivateKey keypair.PrivateKey
 		receiverPrivateKey, err = casper.NewED25519PrivateKeyFromPEMFile(keyPath)
 
 		assert.NotNil(utils.CasperT, receiverPrivateKey, "receiverPrivateKey is nil")
@@ -143,6 +145,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		}
 
 		putDeployResult = result
+		putDeploy = *deploy
 
 		return utils.Pass
 	})
@@ -215,52 +218,83 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 			return err
 		}
 
-		err = utils.ExpectEqual(utils.CasperT, "value type", value.Type.GetTypeID(), cltype.UInt512)
+		err = utils.ExpectEqual(utils.CasperT, "value type", value.Type.GetTypeID(), cltype.UInt512.GetTypeID())
 
 		if err != nil {
 			return err
 		}
 
-		return utils.ExpectEqual(utils.CasperT, "value", *value.UI512.Value(), *big.NewInt(payment))
+		return utils.ExpectEqual(utils.CasperT, "value", value.GetValueByType(), clvalue.NewCLUInt512(big.NewInt(payment)).GetValueByType())
 	})
 
 	ctx.Step(`^the deploy has a valid hash$`, func() error {
-		return utils.NotImplementError
+		return utils.ExpectEqual(utils.CasperT, "hash", infoGetDeployResult.Deploy.Hash.String(), putDeployResult.DeployHash.String())
 	})
 
 	ctx.Step(`^the deploy has a valid timestamp$`, func() error {
-		return utils.NotImplementError
+		if len(infoGetDeployResult.Deploy.Header.Timestamp.ToTime().String()) < 26 {
+			return errors.New("invalid timestamp")
+		}
+		return utils.Pass
 	})
-
 	ctx.Step(`^the deploy has a valid body hash$`, func() error {
-		return utils.NotImplementError
+		return utils.ExpectEqual(utils.CasperT, "body hash",
+			infoGetDeployResult.Deploy.Header.BodyHash.String(),
+			putDeploy.Header.BodyHash.String())
 	})
 
 	ctx.Step(`^the deploy has a session type of "([^"]*)"$`, func(sessionType string) error {
-		return utils.NotImplementError
+
+		if infoGetDeployResult.Deploy.Session.Transfer == nil {
+			return errors.New("missing transfer")
+		}
+
+		return utils.Pass
 	})
 
 	ctx.Step(`^the deploy is approved by user-(\d+)$`, func(userId int) error {
-		return utils.NotImplementError
+
+		approval := infoGetDeployResult.Deploy.Approvals[0]
+		return utils.ExpectEqual(utils.CasperT, "approval", approval.Signer.String(), senderKey.PublicKey().String())
 	})
 
 	ctx.Step(`^the deploy has a gas price of (\d+)$`, func(gasPrice int) error {
-		return utils.NotImplementError
+
+		return utils.ExpectEqual(utils.CasperT, "gas price", infoGetDeployResult.Deploy.Header.GasPrice, uint64(gasPrice))
 	})
 
-	ctx.Step(`^the deploy has a ttl of (\d+)m$`, func(ttl int) error {
-		return utils.NotImplementError
+	ctx.Step(`^the deploy has a ttl of (\d+)m$`, func(ttl int64) error {
+		var expected = types.Duration(ttl * time.Minute.Nanoseconds())
+		return utils.ExpectEqual(utils.CasperT, "gas price", infoGetDeployResult.Deploy.Header.TTL, expected)
 	})
 
-	ctx.Step(`^the deploy session has a "([^"]*)" argument value of type "([^"]*)"$`, func(name string, valueTye string) error {
-		return utils.NotImplementError
+	ctx.Step(`^the deploy session has a "([^"]*)" argument value of type "([^"]*)"$`, func(name string, valueType string) error {
+		actual, err := infoGetDeployResult.Deploy.Session.Transfer.Args.Find(name)
+		if err == nil {
+			value, _ := actual.Value()
+			err = utils.ExpectEqual(utils.CasperT, "dependency", value.Type.Name(), valueType)
+		}
+		return err
 	})
 
-	ctx.Step(`^the deploy session has a "([^"]*)" argument with a numeric value of (\d+)$`, func(name string, value int) error {
-		return utils.NotImplementError
+	ctx.Step(`^the deploy session has a "([^"]*)" argument with a numeric value of (\d+)$`, func(name string, expectedValue int) error {
+		parameter, err := infoGetDeployResult.Deploy.Session.Transfer.Args.Find(name)
+
+		if err == nil {
+			value, _ := parameter.Value()
+			err = utils.ExpectEqual(utils.CasperT, name, value.GetValueByType().String(), fmt.Sprintf("%d", expectedValue))
+		}
+		return err
 	})
 
 	ctx.Step(`^the deploy session has a "([^"]*)" argument with the public key of user-(\d+)$`, func(name string, userId int) error {
-		return utils.NotImplementError
+		parameter, err := infoGetDeployResult.Deploy.Session.Transfer.Args.Find(name)
+
+		if err == nil {
+			value, _ := parameter.Value()
+			var pubKey = *value.PublicKey
+			err = utils.ExpectEqual(utils.CasperT, name, pubKey.String(), receiverPrivateKey.PublicKey().String())
+		}
+		return err
 	})
 }
