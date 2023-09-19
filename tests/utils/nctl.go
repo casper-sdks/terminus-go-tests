@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/acarl005/stripansi"
+	"github.com/antchfx/jsonquery"
 	"github.com/make-software/casper-go-sdk/casper"
 	"io"
 	"log"
+	"math/big"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -45,33 +47,50 @@ func GetNodeStatus(nodeId int) (casper.InfoGetStatusResult, error) {
 	return infoGetStatusResult, err
 }
 
-func nctlExec(command string, params string) (string, error) {
+func GetAccountHash(publicKey string, blockHash string) (string, error) {
+	jsonStr, _ := GetStateAccountInfo(publicKey, blockHash)
+	return GetByJsonPath(jsonStr, "/result/account/account_hash")
+}
 
-	docker := fmt.Sprintf("%v", config["docker-name"])
-	cmd := fmt.Sprintf("docker exec  -t %s /bin/bash -c 'source casper-node/utils/nctl/sh/views/%s %s'", docker, command, params)
+func StateGetBalance(stateRootHash string, purseUref string) (big.Int, error) {
+	var balance = new(big.Int)
 
-	strRes := ""
+	params := fmt.Sprintf("{\"state_root_hash\":\"%s\",\"purse_uref\":\"%s\"}", stateRootHash, purseUref)
+	jsonStr, _ := simpleRcp("state_get_balance", params)
 
-	res, err := exec.Command("/bin/sh", "-c", cmd).Output()
+	balanceStr, err := GetByJsonPath(jsonStr, "/result/balance_value")
 
-	if err != nil {
-		log.Printf("Could not run command: %s", cmd)
-		log.Fatal(err)
-	} else {
-		// Strip out ANSI control characters from response
-		strRes = stripansi.Strip(string(res))
+	if err == nil {
+		balance.SetString(balanceStr, 10)
 	}
 
-	return strRes, err
+	return *balance, err
+}
+
+func GetByJsonPath(jsonStr string, path string) (string, error) {
+	doc, err := jsonquery.Parse(strings.NewReader(jsonStr))
+	value := jsonquery.FindOne(doc, path).Value()
+	return fmt.Sprintf("%v", value), err
+}
+
+func GetStateAccountInfo(publicKey string, blockHash string) (string, error) {
+
+	params := fmt.Sprintf("{\"public_key\":\"%s\",\"block_identifier\":{\"Hash\":\"%s\"}}", publicKey, blockHash)
+
+	return simpleRcp("state_get_account_info", params)
 }
 
 func GetEraSummary(blockHash string) (string, error) {
 
-	var nctlJson string
-	method := "chain_get_era_summary"
-	id := time.Now().UnixMilli()
+	params := fmt.Sprintf("[{\"Hash\":\"%s\"}]}", blockHash)
 
-	payload := fmt.Sprintf(`{"id": %d, "jsonrpc":"2.0","method":"%s","params":[{"Hash":"%s"}]}`, id, method, blockHash)
+	return simpleRcp("chain_get_era_summary", params)
+}
+
+func simpleRcp(method string, params string) (string, error) {
+	var nctlJson string
+	id := time.Now().UnixMilli()
+	payload := fmt.Sprintf(`{"id": %d, "jsonrpc":"2.0","method":"%s","params":%s}`, id, method, params)
 	bufferString := bytes.NewBufferString(payload)
 
 	request, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%v:%v/rpc", config["host-name"], config["port-rcp"]), bufferString)
@@ -94,9 +113,27 @@ func GetEraSummary(blockHash string) (string, error) {
 				log.Fatal(err)
 			}
 			nctlJson = string(bodyBytes)
-
 		}
 	}
-
 	return nctlJson, err
+}
+
+func nctlExec(command string, params string) (string, error) {
+
+	docker := fmt.Sprintf("%v", config["docker-name"])
+	cmd := fmt.Sprintf("docker exec  -t %s /bin/bash -c 'source /home/casper/casper-node/utils/nctl/sh/views/%s %s'", docker, command, params)
+
+	strRes := ""
+
+	res, err := exec.Command("/bin/sh", "-c", cmd).Output()
+
+	if err != nil {
+		log.Printf("Could not run command: %s", cmd)
+		log.Fatal(err)
+	} else {
+		// Strip out ANSI control characters from response
+		strRes = stripansi.Strip(string(res))
+	}
+
+	return strRes, err
 }
