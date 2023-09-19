@@ -9,6 +9,7 @@ import (
 	"github.com/make-software/casper-go-sdk/casper"
 	"io"
 	"log"
+	"math/big"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -49,6 +50,21 @@ func GetNodeStatus(nodeId int) (casper.InfoGetStatusResult, error) {
 func GetAccountHash(publicKey string, blockHash string) (string, error) {
 	jsonStr, _ := GetStateAccountInfo(publicKey, blockHash)
 	return GetByJsonPath(jsonStr, "/result/account/account_hash")
+}
+
+func StateGetBalance(stateRootHash string, purseUref string) (big.Int, error) {
+	var balance = new(big.Int)
+
+	params := fmt.Sprintf("{\"state_root_hash\":\"%s\",\"purse_uref\":\"%s\"}", stateRootHash, purseUref)
+	jsonStr, _ := simpleRcp("state_get_balance", params)
+
+	balanceStr, err := GetByJsonPath(jsonStr, "/result/balance_value")
+
+	if err == nil {
+		balance.SetString(balanceStr, 10)
+	}
+
+	return *balance, err
 }
 
 func GetByJsonPath(jsonStr string, path string) (string, error) {
