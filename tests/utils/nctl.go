@@ -47,6 +47,14 @@ func GetNodeStatus(nodeId int) (casper.InfoGetStatusResult, error) {
 	return infoGetStatusResult, err
 }
 
+func GetStateRootHash(nodeId int) (string, error) {
+	result, err := nctlExec("view_chain_state_root_hash.sh", fmt.Sprintf("node=%d", nodeId))
+	srh := strings.Split(result, "=")[1]
+	srh = strings.TrimSpace(srh)
+	return srh, err
+
+}
+
 func GetAccountHash(publicKey string, blockHash string) (string, error) {
 	jsonStr, _ := GetStateAccountInfo(publicKey, blockHash)
 	return GetByJsonPath(jsonStr, "/result/account/account_hash")
@@ -121,7 +129,7 @@ func simpleRcp(method string, params string) (string, error) {
 func nctlExec(command string, params string) (string, error) {
 
 	docker := fmt.Sprintf("%v", config["docker-name"])
-	cmd := fmt.Sprintf("docker exec  -t %s /bin/bash -c 'source /home/casper/casper-node/utils/nctl/sh/views/%s %s'", docker, command, params)
+	cmd := fmt.Sprintf("docker exec  -t %s /bin/bash -c 'source casper-node/utils/nctl/sh/views/%s %s'", docker, command, params)
 
 	strRes := ""
 
