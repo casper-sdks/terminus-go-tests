@@ -104,9 +104,10 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 
 		if err == nil {
 			err = utils.ExpectEqual(utils.CasperT,
-				"state_root_hash",
-				auctionInfo.AuctionState.BlockHeight,
-				uint64(height))
+				"height",
+				// There is the possibility that the height may have incremented so account for that too
+				auctionInfo.AuctionState.BlockHeight == uint64(height) || auctionInfo.AuctionState.BlockHeight == uint64(height+1),
+				true)
 		}
 
 		return err
