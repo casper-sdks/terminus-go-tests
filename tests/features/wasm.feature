@@ -12,3 +12,12 @@ Feature: wasm operations
     When the contract entry point is invoked with a transfer amount of "2500000000"
     Then the contract invocation deploy is successful
 
+    When the the contract is invoked by name "ERC20" and a transfer amount of "2400000000"
+    Then the contract invocation deploy is successful
+
+    When the the contract is invoked by hash and version with a transfer amount of "2500000000"
+    Then the contract invocation deploy is successful
+
+    When the the contract is invoked by name "ERC20" and version with a transfer amount of "2400000000"
+    Then the contract invocation deploy is successful
+
