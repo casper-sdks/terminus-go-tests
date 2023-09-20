@@ -83,7 +83,11 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		expectedStateRootHash, err := utils.GetByJsonPath(jsonAuctionInfo, "/result/auction_state/state_root_hash")
 
 		if err == nil {
-			err = utils.ExpectEqual(utils.CasperT, "state_root_hash", auctionInfo.AuctionState.StateRootHash, expectedStateRootHash)
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"state_root_hash",
+				auctionInfo.AuctionState.StateRootHash,
+				expectedStateRootHash)
 		}
 		return err
 	})
@@ -99,7 +103,10 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		}
 
 		if err == nil {
-			err = utils.ExpectEqual(utils.CasperT, "state_root_hash", auctionInfo.AuctionState.BlockHeight, uint64(height))
+			err = utils.ExpectEqual(utils.CasperT,
+				"state_root_hash",
+				auctionInfo.AuctionState.BlockHeight,
+				uint64(height))
 		}
 
 		return err
@@ -109,30 +116,52 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 
 		bidsNode, err := utils.GetNodeByJsonPath(jsonAuctionInfo, "/result/auction_state/bids")
 
-		err = utils.ExpectEqual(utils.CasperT, "bids length", len(auctionInfo.AuctionState.Bids), len(bidsNode.ChildNodes()))
+		err = utils.ExpectEqual(utils.CasperT,
+			"bids length",
+			len(auctionInfo.AuctionState.Bids),
+			len(bidsNode.ChildNodes()))
 
 		if err == nil {
 			var publicKey *jsonquery.Node
 			publicKey, err = jsonquery.Query(bidsNode.FirstChild, "/public_key")
-			err = utils.ExpectEqual(utils.CasperT, "public_key", auctionInfo.AuctionState.Bids[0].PublicKey.String(), publicKey.Value())
+
+			err = utils.ExpectEqual(utils.CasperT,
+				"public_key",
+				auctionInfo.AuctionState.Bids[0].PublicKey.String(),
+				publicKey.Value())
 		}
 
 		if err == nil {
 			var bondingPurse *jsonquery.Node
 			bondingPurse, err = jsonquery.Query(bidsNode.FirstChild, "/bid/bonding_purse")
-			err = utils.ExpectEqual(utils.CasperT, "public_key", auctionInfo.AuctionState.Bids[0].Bid.BondingPurse.String(), bondingPurse.Value())
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"public_key",
+				auctionInfo.AuctionState.Bids[0].Bid.BondingPurse.String(),
+				bondingPurse.Value())
 		}
 
 		if err == nil {
 			var delegationRate *jsonquery.Node
 			delegationRate, err = jsonquery.Query(bidsNode.FirstChild, "/bid/delegation_rate")
-			err = utils.ExpectEqual(utils.CasperT, "public_key", auctionInfo.AuctionState.Bids[0].Bid.DelegationRate, float32(delegationRate.Value().(float64)))
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"public_key",
+				auctionInfo.AuctionState.Bids[0].Bid.DelegationRate,
+				float32(delegationRate.Value().(float64)))
 		}
 
 		if err == nil {
 			var inactive *jsonquery.Node
 			inactive, err = jsonquery.Query(bidsNode.FirstChild, "/bid/inactive")
-			err = utils.ExpectEqual(utils.CasperT, "public_key", auctionInfo.AuctionState.Bids[0].Bid.Inactive, inactive.Value())
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"public_key",
+				auctionInfo.AuctionState.Bids[0].Bid.Inactive,
+				inactive.Value())
 		}
 
 		if err == nil {
@@ -140,7 +169,12 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 			stakedAmount, err = jsonquery.Query(bidsNode.FirstChild, "/bid/staked_amount")
 			val := big.Int{}
 			val.SetString(fmt.Sprintf("%v", stakedAmount.Value()), 10)
-			err = utils.ExpectEqual(utils.CasperT, "public_key", auctionInfo.AuctionState.Bids[0].Bid.StakedAmount, val.Uint64())
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"public_key",
+				auctionInfo.AuctionState.Bids[0].Bid.StakedAmount,
+				val.Uint64())
 		}
 
 		if err == nil {
@@ -148,7 +182,12 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 			var delegatee *jsonquery.Node
 			delegators, err = jsonquery.Query(bidsNode.FirstChild, "/bid/delegators")
 			delegatee, err = jsonquery.Query(delegators.FirstChild, "/delegatee")
-			err = utils.ExpectEqual(utils.CasperT, "public_key", auctionInfo.AuctionState.Bids[0].Bid.Delegators[0].Delegatee.String(), delegatee.Value())
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"public_key",
+				auctionInfo.AuctionState.Bids[0].Bid.Delegators[0].Delegatee.String(),
+				delegatee.Value())
 		}
 
 		if err == nil {
@@ -156,7 +195,12 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 			var publicKey *jsonquery.Node
 			delegators, err = jsonquery.Query(bidsNode.FirstChild, "/bid/delegators")
 			publicKey, err = jsonquery.Query(delegators.FirstChild, "/public_key")
-			err = utils.ExpectEqual(utils.CasperT, "public_key", auctionInfo.AuctionState.Bids[0].Bid.Delegators[0].PublicKey.String(), publicKey.Value())
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"public_key",
+				auctionInfo.AuctionState.Bids[0].Bid.Delegators[0].PublicKey.String(),
+				publicKey.Value())
 		}
 
 		if err == nil {
@@ -166,7 +210,12 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 			stakedAmount, err = jsonquery.Query(delegators.FirstChild, "/staked_amount")
 			val := big.Int{}
 			val.SetString(fmt.Sprintf("%v", stakedAmount.Value()), 10)
-			err = utils.ExpectEqual(utils.CasperT, "public_key", auctionInfo.AuctionState.Bids[0].Bid.Delegators[0].StakedAmount, val.Uint64())
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"public_key",
+				auctionInfo.AuctionState.Bids[0].Bid.Delegators[0].StakedAmount,
+				val.Uint64())
 		}
 
 		return err
@@ -176,25 +225,44 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 
 		validatorsNode, err := utils.GetNodeByJsonPath(jsonAuctionInfo, "/result/auction_state/era_validators")
 
-		err = utils.ExpectEqual(utils.CasperT, "bids length", len(auctionInfo.AuctionState.EraValidators), len(validatorsNode.ChildNodes()))
+		err = utils.ExpectEqual(
+			utils.CasperT,
+			"bids length",
+			len(auctionInfo.AuctionState.EraValidators),
+			len(validatorsNode.ChildNodes()))
 
 		if err == nil {
 			eraId := jsonquery.FindOne(validatorsNode.FirstChild, "/era_id")
-			err = utils.ExpectEqual(utils.CasperT, "eraId", auctionInfo.AuctionState.EraValidators[0].EraID, uint32(eraId.Value().(float64)))
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"eraId",
+				auctionInfo.AuctionState.EraValidators[0].EraID,
+				uint32(eraId.Value().(float64)))
 		}
 
 		validatorWeights := jsonquery.FindOne(validatorsNode.FirstChild, "/validator_weights")
 
 		if err == nil {
 			publicKey := jsonquery.FindOne(validatorWeights.FirstChild, "/public_key")
-			err = utils.ExpectEqual(utils.CasperT, "eraId", auctionInfo.AuctionState.EraValidators[0].ValidatorWeights[0].Validator.String(), publicKey.Value())
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"eraId",
+				auctionInfo.AuctionState.EraValidators[0].ValidatorWeights[0].Validator.String(),
+				publicKey.Value())
 		}
 
 		if err == nil {
 			weight := jsonquery.FindOne(validatorWeights.FirstChild, "/weight")
 			val := big.Int{}
 			val.SetString(fmt.Sprintf("%v", weight.Value()), 10)
-			err = utils.ExpectEqual(utils.CasperT, "eraId", auctionInfo.AuctionState.EraValidators[0].ValidatorWeights[0].Weight.Value().String(), val.String())
+
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"eraId",
+				auctionInfo.AuctionState.EraValidators[0].ValidatorWeights[0].Weight.Value().String(),
+				val.String())
 		}
 
 		return err
@@ -207,5 +275,4 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	ctx.Step(`^an error message of "([^"]*)" is returned$`, func(errorMessage string) error {
 		return utils.ExpectEqual(utils.CasperT, "error code", rpcErr.Message, errorMessage)
 	})
-
 }
