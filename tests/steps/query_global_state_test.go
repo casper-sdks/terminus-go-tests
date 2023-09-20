@@ -148,7 +148,7 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 			return fmt.Errorf("Should have error ")
 		}
 
-		expectedErr = getRpcError(errors.Unwrap(err))
+		expectedErr = utils.GetRpcError(errors.Unwrap(err))
 
 		return utils.Pass
 	})
@@ -184,16 +184,10 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 			return fmt.Errorf("Should have error ")
 		}
 
-		expectedErr = getRpcError(errors.Unwrap(err))
+		expectedErr = utils.GetRpcError(errors.Unwrap(err))
 
 		return utils.Pass
 	})
-}
-
-func getRpcError(err interface{}) rpc.RpcError {
-	rpcError := err.(*rpc.RpcError)
-	fmt.Println(rpcError.Code)
-	return *rpcError
 }
 
 func createTransfer(sdk casper.RPCClient) (rpc.PutDeployResult, error) {
