@@ -16,6 +16,7 @@ import (
 	"time"
 )
 
+// Steps for the state_get_auction_info.feature
 func GetNctlLatestBlock() (casper.Block, error) {
 
 	block := casper.Block{}
@@ -76,9 +77,21 @@ func StateGetBalance(stateRootHash string, purseUref string) (big.Int, error) {
 }
 
 func GetByJsonPath(jsonStr string, path string) (string, error) {
+	node, err := GetNodeByJsonPath(jsonStr, path)
+	if err == nil {
+		return fmt.Sprintf("%v", node.Value()), nil
+	} else {
+		return "", err
+	}
+}
+
+func GetNodeByJsonPath(jsonStr string, path string) (*jsonquery.Node, error) {
 	doc, err := jsonquery.Parse(strings.NewReader(jsonStr))
-	value := jsonquery.FindOne(doc, path).Value()
-	return fmt.Sprintf("%v", value), err
+	var node *jsonquery.Node
+	if err == nil {
+		node = jsonquery.FindOne(doc, path)
+	}
+	return node, err
 }
 
 func GetStateAccountInfo(publicKey string, blockHash string) (string, error) {
@@ -93,6 +106,11 @@ func GetEraSummary(blockHash string) (string, error) {
 	params := fmt.Sprintf("[{\"Hash\":\"%s\"}]}", blockHash)
 
 	return simpleRcp("chain_get_era_summary", params)
+}
+
+func GetAuctionInfoByHash(hash string) (string, error) {
+	auctionInfoJson, err := simpleRcp("state_get_auction_info", fmt.Sprintf("[{\"Hash\": \"%s\"}]", hash))
+	return auctionInfoJson, err
 }
 
 func simpleRcp(method string, params string) (string, error) {

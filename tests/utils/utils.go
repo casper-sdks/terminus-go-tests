@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/make-software/casper-go-sdk/rpc"
 	"github.com/stretchr/testify/assert"
 	yml "gopkg.in/yaml.v2"
 	"log"
@@ -16,7 +17,7 @@ var (
 	root              = filepath.Join(filepath.Dir(b), "../..")
 	config            map[string]interface{}
 	Pass              error = nil
-	NotImplementError       = fmt.Errorf("not Implemented.")
+	NotImplementError       = fmt.Errorf("Not Implemented.")
 )
 
 func ReadConfig() {
@@ -44,14 +45,6 @@ func (a *asserter) Errorf(format string, args ...interface{}) {
 	a.err = fmt.Errorf(format, args...)
 }
 
-func Result(err error) error {
-	if err != nil {
-		return err
-	} else {
-		return nil
-	}
-}
-
 type expectedAndActualAssertion func(t assert.TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool
 
 func GetUserKeyAssetPath(networkId int, userId int, keyFilename string) string {
@@ -69,4 +62,10 @@ func ExpectEqual(t *testing.T, attribute string, actual any, expected any) error
 
 func CreateExpectError(attribute string, actual any, expected any) error {
 	return fmt.Errorf("%s expected %s to be %s", attribute, actual, expected)
+}
+
+func GetRpcError(err interface{}) rpc.RpcError {
+	rpcError := err.(*rpc.RpcError)
+	fmt.Println(rpcError.Code)
+	return *rpcError
 }
