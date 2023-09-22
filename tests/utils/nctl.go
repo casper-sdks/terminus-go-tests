@@ -103,7 +103,7 @@ func GetStateAccountInfo(publicKey string, blockHash string) (string, error) {
 
 func GetEraSummary(blockHash string) (string, error) {
 
-	params := fmt.Sprintf("[{\"Hash\":\"%s\"}]}", blockHash)
+	params := fmt.Sprintf("[{\"Hash\":\"%s\"}]", blockHash)
 
 	return simpleRcp("chain_get_era_summary", params)
 }
