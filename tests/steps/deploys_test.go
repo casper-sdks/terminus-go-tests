@@ -32,7 +32,7 @@ func TestFeaturesDeploys(t *testing.T) {
 
 var (
 	putDeployResult     rpc.PutDeployResult
-	infoGetDeployResult casper.InfoGetDeployResult
+	infoGetDeployResult rpc.InfoGetDeployResult
 	blockHash           string
 	putDeploy           casper.Deploy
 	senderKey           keypair.PrivateKey
