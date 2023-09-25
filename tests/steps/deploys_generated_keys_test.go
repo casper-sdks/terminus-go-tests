@@ -162,11 +162,12 @@ func doDeploy(sdk casper.RPCClient,
 }
 
 func generateKey(keyAlgo string) (keypair.PrivateKey, error) {
-	if keyAlgo == ED25519 {
+	switch keyAlgo {
+	case ED25519:
 		return keypair.GeneratePrivateKey(keypair.ED25519)
-	} else if keyAlgo == SECP256K1 {
+	case SECP256K1:
 		return keypair.GeneratePrivateKey(keypair.SECP256K1)
-	} else {
+	default:
 		return keypair.PrivateKey{}, fmt.Errorf("unsupported keyAlgo %s", keyAlgo)
 	}
 }
