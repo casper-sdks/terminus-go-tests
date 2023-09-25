@@ -52,7 +52,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that user-(\d+) initiates a transfer to user-(\d+)$`, func(senderId int, receiverId int) error {
-		err := utils.Pass
+		var err error
 
 		keyPath := utils.GetUserKeyAssetPath(1, senderId, "secret_key.pem")
 
@@ -244,7 +244,6 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy has a session type of "([^"]*)"$`, func(sessionType string) error {
-
 		if infoGetDeployResult.Deploy.Session.Transfer == nil {
 			return errors.New("missing transfer")
 		}
@@ -253,18 +252,16 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy is approved by user-(\d+)$`, func(userId int) error {
-
 		approval := infoGetDeployResult.Deploy.Approvals[0]
 		return utils.ExpectEqual(utils.CasperT, "approval", approval.Signer.String(), senderKey.PublicKey().String())
 	})
 
 	ctx.Step(`^the deploy has a gas price of (\d+)$`, func(gasPrice int) error {
-
 		return utils.ExpectEqual(utils.CasperT, "gas price", infoGetDeployResult.Deploy.Header.GasPrice, uint64(gasPrice))
 	})
 
 	ctx.Step(`^the deploy has a ttl of (\d+)m$`, func(ttl int64) error {
-		var expected = types.Duration(ttl * time.Minute.Nanoseconds())
+		expected := types.Duration(ttl * time.Minute.Nanoseconds())
 		return utils.ExpectEqual(utils.CasperT, "gas price", infoGetDeployResult.Deploy.Header.TTL, expected)
 	})
 
@@ -292,7 +289,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 
 		if err == nil {
 			value, _ := parameter.Value()
-			var pubKey = *value.PublicKey
+			pubKey := *value.PublicKey
 			err = utils.ExpectEqual(utils.CasperT, name, pubKey.String(), receiverPrivateKey.PublicKey().String())
 		}
 		return err

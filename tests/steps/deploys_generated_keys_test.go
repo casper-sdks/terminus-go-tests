@@ -4,11 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/make-software/casper-go-sdk/rpc"
-	"github.com/make-software/casper-go-sdk/types"
-	"github.com/make-software/casper-go-sdk/types/clvalue"
-	"github.com/make-software/casper-go-sdk/types/keypair"
-	"github.com/stretchr/testify/assert"
 	"math/big"
 	"math/rand"
 	"testing"
@@ -16,14 +11,21 @@ import (
 
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
+	"github.com/make-software/casper-go-sdk/rpc"
+	"github.com/make-software/casper-go-sdk/types"
+	"github.com/make-software/casper-go-sdk/types/clvalue"
+	"github.com/make-software/casper-go-sdk/types/keypair"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 var keysDeployResult rpc.PutDeployResult
 
-const ED25519 = "Ed25519"
-const SECP256K1 = "Secp256k1"
+const (
+	ED25519   = "Ed25519"
+	SECP256K1 = "Secp256k1"
+)
 
 // The test features implementation for the deploys_generated_keys.feature
 func TestFeaturesGeneratedKeys(t *testing.T) {
@@ -31,7 +33,6 @@ func TestFeaturesGeneratedKeys(t *testing.T) {
 }
 
 func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
-
 	var sdk casper.RPCClient
 	var senderKey keypair.PrivateKey
 	var faucetKey keypair.PrivateKey
@@ -44,7 +45,6 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that a "([^"]*)" sender key is generated$`, func(keyAlgo string) error {
-
 		var err error
 
 		senderKey, err = generateKey(keyAlgo)
@@ -65,7 +65,6 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^fund the account from the faucet user with a transfer amount of (\d+) and a payment amount of (\d+)$`, func(transfer int64, payment int64) error {
-
 		var err error
 
 		faucetKey, err = casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
@@ -78,13 +77,11 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^wait for a block added event with a timeout of (\d+) seconds$`, func(timeoutSeconds int) error {
-
 		_, err := utils.WaitForBlockAdded(keysDeployResult.DeployHash.String(), timeoutSeconds)
 		return err
 	})
 
 	ctx.Step(`^that a "([^"]*)" receiver key is generated$`, func(keyAlgo string) error {
-
 		var err error
 
 		receiverKey, err = generateKey(keyAlgo)
@@ -101,7 +98,6 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`the transfer approvals signer contains the "([^"]*)" algo$`, func(keyAlg string) error {
-
 		deploy, err := sdk.GetDeploy(context.Background(), keysDeployResult.DeployHash.String())
 
 		approval := deploy.Deploy.Approvals[0]
@@ -120,8 +116,8 @@ func doDeploy(sdk casper.RPCClient,
 	faucet keypair.PrivateKey,
 	receiverKey keypair.PublicKey,
 	transfer int64,
-	payment int64) error {
-
+	payment int64,
+) error {
 	var deployJson []byte
 	header := types.DefaultHeader()
 	header.ChainName = "casper-net-1"
@@ -165,7 +161,6 @@ func doDeploy(sdk casper.RPCClient,
 }
 
 func generateKey(keyAlgo string) (keypair.PrivateKey, error) {
-
 	if keyAlgo == ED25519 {
 		return keypair.GeneratePrivateKey(keypair.ED25519)
 	} else if keyAlgo == SECP256K1 {

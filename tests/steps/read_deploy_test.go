@@ -6,15 +6,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cucumber/godog"
-	"github.com/make-software/casper-go-sdk/types"
-	"github.com/make-software/casper-go-sdk/types/clvalue"
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 	"math/big"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/cucumber/godog"
+	"github.com/make-software/casper-go-sdk/types"
+	"github.com/make-software/casper-go-sdk/types/clvalue"
+
+	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 // The test features implementation for the read_deploy.feature
@@ -23,7 +25,6 @@ func TestFeaturesReadDeploy(t *testing.T) {
 }
 
 func InitializeReadDeploy(ctx *godog.ScenarioContext) {
-
 	var deploy types.Deploy
 
 	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
@@ -32,7 +33,6 @@ func InitializeReadDeploy(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that the "transfer.json" JSON deploy is loaded$`, func() error {
-
 		deployBytes, err := os.ReadFile("../json/transfer.json")
 
 		if err == nil {
@@ -43,7 +43,7 @@ func InitializeReadDeploy(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^a valid transfer deploy is created$`, func() error {
-		if &deploy == nil {
+		if len(deploy.Hash.String()) == 0 {
 			return errors.New("deploy not created")
 		}
 		return utils.Pass
@@ -59,13 +59,12 @@ func InitializeReadDeploy(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the timestamp is "([^"]*)"$`, func(timestamp string) error {
 		timestamp = strings.ReplaceAll(timestamp, ".104", "")
-		actual := fmt.Sprintf(deploy.Header.Timestamp.ToTime().Format(time.RFC3339))
+		actual := fmt.Sprint(deploy.Header.Timestamp.ToTime().Format(time.RFC3339))
 		return utils.ExpectEqual(utils.CasperT, "timestamp", actual, timestamp)
 	})
 
 	ctx.Step(`^the ttl is (\d+)m$`, func(ttl int64) error {
-
-		var expected = types.Duration(ttl * time.Minute.Nanoseconds())
+		expected := types.Duration(ttl * time.Minute.Nanoseconds())
 		return utils.ExpectEqual(utils.CasperT, "ttl", deploy.Header.TTL, expected)
 	})
 
@@ -101,7 +100,6 @@ func InitializeReadDeploy(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the session "([^"]*)" is (\d+)$`, func(parameterName string, amount int64) error {
-
 		parameter, err := deploy.Session.Transfer.Args.Find(parameterName)
 
 		if err == nil {
@@ -132,7 +130,6 @@ func InitializeReadDeploy(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the session "([^"]*)" bytes is "([^"]*)"$`, func(parameterName string, hexBytes string) error {
-
 		parameter, err := deploy.Session.Transfer.Args.Find(parameterName)
 
 		if err == nil {

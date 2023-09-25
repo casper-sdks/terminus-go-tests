@@ -3,14 +3,16 @@ package steps
 import (
 	"context"
 	"errors"
+	"strconv"
+	"strings"
+	"testing"
+
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
 	"github.com/make-software/casper-go-sdk/types/keypair"
+
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
-	"strconv"
-	"strings"
-	"testing"
 )
 
 // Step Definitions for the state_get_account_info.feature
@@ -35,8 +37,11 @@ func InitializeStateGetAccountInfoFeature(ctx *godog.ScenarioContext) {
 		var err error
 
 		latest, err = sdk.GetBlockLatest(context.Background())
-		keyPath := utils.GetUserKeyAssetPath(1, 1, "secret_key.pem")
-		senderKey, err = casper.NewED25519PrivateKeyFromPEMFile(keyPath)
+
+		if err == nil {
+			keyPath := utils.GetUserKeyAssetPath(1, 1, "secret_key.pem")
+			senderKey, err = casper.NewED25519PrivateKeyFromPEMFile(keyPath)
+		}
 
 		if err == nil {
 			accountInfo, err = sdk.GetAccountInfoByBlochHash(context.Background(), latest.Block.Hash.String(), senderKey.PublicKey())
@@ -69,7 +74,11 @@ func InitializeStateGetAccountInfoFeature(ctx *godog.ScenarioContext) {
 				intVal, _ := strconv.ParseInt(expectedDeployment, 10, 16)
 				err = utils.ExpectEqual(utils.CasperT, "deployment", accountInfo.Account.ActionThresholds.Deployment, uint64(intVal))
 			}
-			expectedKeyManagement, err = utils.GetByJsonPath(accountInfoJson, "/result/account/action_thresholds/key_management")
+
+			if err == nil {
+				expectedKeyManagement, err = utils.GetByJsonPath(accountInfoJson, "/result/account/action_thresholds/key_management")
+			}
+
 			if err == nil {
 				intVal, _ := strconv.ParseInt(expectedKeyManagement, 10, 16)
 				err = utils.ExpectEqual(utils.CasperT, "key_management", accountInfo.Account.ActionThresholds.KeyManagement, uint64(intVal))
@@ -85,7 +94,6 @@ func InitializeStateGetAccountInfoFeature(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the state_get_account_info_result contain a valid merkle proof$`, func() error {
-
 		// Merkel Proof missing
 		merkleProof, _ := utils.GetByJsonPath(accountInfoJson, "/result/merkle_proof")
 		if merkleProof == "" {

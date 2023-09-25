@@ -2,11 +2,13 @@ package steps
 
 import (
 	"context"
+	"testing"
+
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
+
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
-	"testing"
 )
 
 // The test features implementation for the state_get_dictionary_item.feature
@@ -15,7 +17,6 @@ func TestFeaturesStateGetDictionaryItem(t *testing.T) {
 }
 
 func InitializeStateGetDictionaryItem(ctx *godog.ScenarioContext) {
-
 	var sdk casper.RPCClient
 	var mainPurse string
 	var dictionaryItem rpc.StateGetDictionaryResult
@@ -28,14 +29,16 @@ func InitializeStateGetDictionaryItem(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that the state_get_dictionary_item RCP method is invoked$`, func() error {
-
 		var latestBlock rpc.ChainGetBlockResult
 		var accountInfo rpc.StateGetAccountInfo
+		var stateRootHash rpc.ChainGetStateRootHashResult
 
 		faucetKey, err := casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
 
-		faucetAccountHash = faucetKey.PublicKey().AccountHash().String()
-		stateRootHash, err := sdk.GetStateRootHashLatest(context.Background())
+		if err == nil {
+			faucetAccountHash = faucetKey.PublicKey().AccountHash().String()
+			stateRootHash, err = sdk.GetStateRootHashLatest(context.Background())
+		}
 
 		if err == nil {
 			latestBlock, err = sdk.GetBlockLatest(context.Background())
@@ -56,7 +59,6 @@ func InitializeStateGetDictionaryItem(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^a valid state_get_dictionary_item_result is returned$`, func() error {
-
 		var err error
 		accountHash := dictionaryItem.StoredValue.Account.AccountHash.String()
 
@@ -68,5 +70,4 @@ func InitializeStateGetDictionaryItem(ctx *godog.ScenarioContext) {
 
 		return err
 	})
-
 }

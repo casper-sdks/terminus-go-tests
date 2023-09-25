@@ -5,6 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"math/big"
+	"math/rand"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
@@ -12,14 +19,9 @@ import (
 	"github.com/make-software/casper-go-sdk/types"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
 	"github.com/make-software/casper-go-sdk/types/keypair"
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 	"github.com/stretchr/testify/assert"
-	"log"
-	"math/big"
-	"math/rand"
-	"strings"
-	"testing"
-	"time"
+
+	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 // The test features implementation for the query_global_state.feature
@@ -28,7 +30,6 @@ func TestFeaturesQueryGlobalState(t *testing.T) {
 }
 
 func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
-
 	var sdk casper.RPCClient
 	var deployResult rpc.PutDeployResult
 	var lastBlockAdded sse.BlockAddedEvent
@@ -43,10 +44,11 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that a valid block hash is known$`, func() error {
-
 		err := utils.Pass
 
-		deployResult, err = createTransfer(sdk)
+		if err == nil {
+			deployResult, err = createTransfer(sdk)
+		}
 
 		if err == nil {
 			lastBlockAdded, err = utils.WaitForBlockAdded(deployResult.DeployHash.String(), 300)
@@ -63,7 +65,6 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`a valid query_global_state_result is returned$`, func() error {
-
 		err := utils.ExpectEqual(utils.CasperT, "ApiVersion", globalState.ApiVersion, "1.0.0")
 
 		if err == nil && len(globalState.MerkleProof) == 0 {
@@ -98,7 +99,6 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`the query_global_state_result contains a valid deploy info stored value$`, func() error {
-
 		if globalState.StoredValue.DeployInfo == nil {
 			return fmt.Errorf("missing value in global state")
 		}
@@ -173,7 +173,6 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`the query_global_state RCP method is invoked with an invalid block hash as the query identifier$`, func() error {
-
 		blockHash := "06e04c9e3b8b084d169b4908ac68a797374d325cbe919e01d290d6b7f5c720d0"
 
 		key := "deploy-" + deployResult.DeployHash.String()
@@ -191,9 +190,8 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 }
 
 func createTransfer(sdk casper.RPCClient) (rpc.PutDeployResult, error) {
-
 	var err error = nil
-	var amount = big.NewInt(2500000000)
+	amount := big.NewInt(2500000000)
 	var deployJson []byte
 	var senderKey keypair.PrivateKey
 	var receiverKey keypair.PrivateKey
