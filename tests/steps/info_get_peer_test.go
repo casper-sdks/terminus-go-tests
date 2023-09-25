@@ -3,14 +3,16 @@ package steps
 import (
 	"context"
 	"fmt"
-	"github.com/cucumber/godog"
-	"github.com/make-software/casper-go-sdk/casper"
-	"github.com/make-software/casper-go-sdk/rpc"
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/cucumber/godog"
+	"github.com/make-software/casper-go-sdk/casper"
+	"github.com/make-software/casper-go-sdk/rpc"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 // The test features implementation for the info_get_peers.feature
@@ -19,18 +21,16 @@ func TestFeaturesInfoGetPeer(t *testing.T) {
 }
 
 func InitializeInfoGetPeers(ctx *godog.ScenarioContext) {
-
 	var sdk casper.RPCClient
 	var infoGetPeersResult rpc.InfoGetPeerResult
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
 	})
 
 	ctx.Step(`^that the info_get_peers RPC method is invoked against a node$`, func() error {
-
 		result, err := sdk.GetPeers(context.Background())
 
 		infoGetPeersResult = result
@@ -39,14 +39,12 @@ func InitializeInfoGetPeers(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the node returns an info_get_peers_result`, func() error {
-
 		assert.NotNil(utils.CasperT, infoGetPeersResult, "infoGetPeersResult is nil")
 
 		return utils.Pass
 	})
 
 	ctx.Step(`^the info_get_peers_result has an API version of "([^"]*)"$`, func(apiVersion string) error {
-
 		if apiVersion != infoGetPeersResult.ApiVersion {
 			return fmt.Errorf("expected %s ApiVersion to be %s", infoGetPeersResult.ApiVersion, apiVersion)
 		}
@@ -62,15 +60,13 @@ func InitializeInfoGetPeers(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the info_get_peers_result contains a valid peer with a port number of (\d+)$`, func(portNumber int) error {
-
-		var found = false
+		found := false
 
 		for i := 0; i < len(infoGetPeersResult.Peers); i++ {
 
 			port := strings.Split(infoGetPeersResult.Peers[i].Address, ":")[1]
 
 			actualPort, err := strconv.Atoi(port)
-
 			if err != nil {
 				return err
 			}

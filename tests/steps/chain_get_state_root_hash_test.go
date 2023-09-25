@@ -2,11 +2,13 @@ package steps
 
 import (
 	"context"
+	"testing"
+
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
+
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
-	"testing"
 )
 
 // Step Definitions for the eras.feature
@@ -19,7 +21,7 @@ func InitializeChainGetStateRootHashFeature(ctx *godog.ScenarioContext) {
 	var stateRootHash rpc.ChainGetStateRootHashResult
 	var expectedStateRootHash string
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil

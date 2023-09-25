@@ -2,12 +2,14 @@ package steps
 
 import (
 	"context"
+	"testing"
+
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 	"github.com/stretchr/testify/assert"
-	"testing"
+
+	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 type _map struct {
@@ -22,8 +24,7 @@ func TestFeaturesBlocks(t *testing.T) {
 }
 
 func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
-
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		return ctx, nil
 	})
@@ -42,7 +43,6 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that the latest block is requested via the sdk$`, func() error {
-
 		block, err := utils.GetSdk().GetBlockLatest(context.Background())
 		if err != nil {
 			return err

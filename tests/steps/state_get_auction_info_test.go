@@ -4,14 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
+	"strconv"
+	"testing"
+
 	"github.com/antchfx/jsonquery"
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
+
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
-	"math/big"
-	"strconv"
-	"testing"
 )
 
 // Step Definitions for the state_get_account_info.feature
@@ -25,36 +27,41 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	var jsonAuctionInfo string
 	var rpcErr rpc.RpcError
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
 	})
 
 	ctx.Step(`^that the state_get_auction_info RPC method is invoked by hash block identifier$`, func() error {
-
 		latest, err := sdk.GetBlockLatest(context.Background())
 
-		jsonAuctionInfo, err = utils.GetAuctionInfoByHash(latest.Block.Header.ParentHash.String())
+		if err == nil {
+			jsonAuctionInfo, err = utils.GetAuctionInfoByHash(latest.Block.Header.ParentHash.String())
+		}
 
-		auctionInfo, err = sdk.GetAuctionInfoByHash(context.Background(), latest.Block.Header.ParentHash.String())
+		if err == nil {
+			auctionInfo, err = sdk.GetAuctionInfoByHash(context.Background(), latest.Block.Header.ParentHash.String())
+		}
 
 		return err
 	})
 
 	ctx.Step(`^that the state_get_auction_info RPC method is invoked by height block identifier$`, func() error {
-
 		latest, err := sdk.GetBlockLatest(context.Background())
 
-		jsonAuctionInfo, err = utils.GetAuctionInfoByHash(latest.Block.Header.ParentHash.String())
+		if err == nil {
+			jsonAuctionInfo, err = utils.GetAuctionInfoByHash(latest.Block.Header.ParentHash.String())
+		}
 
-		auctionInfo, err = sdk.GetAuctionInfoByHeight(context.Background(), latest.Block.Header.Height)
+		if err == nil {
+			auctionInfo, err = sdk.GetAuctionInfoByHeight(context.Background(), latest.Block.Header.Height)
+		}
 
 		return err
 	})
 
 	ctx.Step(`^that the state_get_auction_info RPC method is invoked by an invalid block hash identifier$`, func() error {
-
 		_, err := sdk.GetAuctionInfoByHash(context.Background(), "9608b4b7029a18ae35373eab879f523850a1b1fd43a3e6da774826a343af4ad2")
 
 		if err != nil {
@@ -66,12 +73,10 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^a valid state_get_auction_info_result is returned$`, func() error {
-
 		if len(auctionInfo.AuctionState.StateRootHash) == 0 {
 			return errors.New("invalid auction info")
 		}
 		return utils.Pass
-
 	})
 
 	ctx.Step(`^the state_get_auction_info_result has and api version of "([^"]*)"$`, func(apiVersion string) error {
@@ -79,7 +84,6 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the state_get_auction_info_result action_state has a valid state root hash$`, func() error {
-
 		expectedStateRootHash, err := utils.GetByJsonPath(jsonAuctionInfo, "/result/auction_state/state_root_hash")
 
 		if err == nil {
@@ -93,7 +97,6 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the state_get_auction_info_result action_state has a valid height$`, func() error {
-
 		var height int64
 
 		expectedHeight, err := utils.GetByJsonPath(jsonAuctionInfo, "/result/auction_state/block_height")
@@ -114,18 +117,27 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the state_get_auction_info_result action_state has valid bids$`, func() error {
+		var publicKey *jsonquery.Node
+		var bondingPurse *jsonquery.Node
+		var delegationRate *jsonquery.Node
+		var inactive *jsonquery.Node
+		var stakedAmount *jsonquery.Node
+		val := big.Int{}
 
 		bidsNode, err := utils.GetNodeByJsonPath(jsonAuctionInfo, "/result/auction_state/bids")
 
-		err = utils.ExpectEqual(utils.CasperT,
-			"bids length",
-			len(auctionInfo.AuctionState.Bids),
-			len(bidsNode.ChildNodes()))
+		if err == nil {
+			err = utils.ExpectEqual(utils.CasperT,
+				"bids length",
+				len(auctionInfo.AuctionState.Bids),
+				len(bidsNode.ChildNodes()))
+		}
 
 		if err == nil {
-			var publicKey *jsonquery.Node
 			publicKey, err = jsonquery.Query(bidsNode.FirstChild, "/public_key")
+		}
 
+		if err == nil {
 			err = utils.ExpectEqual(utils.CasperT,
 				"public_key",
 				auctionInfo.AuctionState.Bids[0].PublicKey.String(),
@@ -133,9 +145,10 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		}
 
 		if err == nil {
-			var bondingPurse *jsonquery.Node
 			bondingPurse, err = jsonquery.Query(bidsNode.FirstChild, "/bid/bonding_purse")
+		}
 
+		if err == nil {
 			err = utils.ExpectEqual(
 				utils.CasperT,
 				"public_key",
@@ -144,9 +157,10 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		}
 
 		if err == nil {
-			var delegationRate *jsonquery.Node
 			delegationRate, err = jsonquery.Query(bidsNode.FirstChild, "/bid/delegation_rate")
+		}
 
+		if err == nil {
 			err = utils.ExpectEqual(
 				utils.CasperT,
 				"public_key",
@@ -155,9 +169,10 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		}
 
 		if err == nil {
-			var inactive *jsonquery.Node
 			inactive, err = jsonquery.Query(bidsNode.FirstChild, "/bid/inactive")
+		}
 
+		if err == nil {
 			err = utils.ExpectEqual(
 				utils.CasperT,
 				"public_key",
@@ -166,11 +181,11 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		}
 
 		if err == nil {
-			var stakedAmount *jsonquery.Node
 			stakedAmount, err = jsonquery.Query(bidsNode.FirstChild, "/bid/staked_amount")
-			val := big.Int{}
 			val.SetString(fmt.Sprintf("%v", stakedAmount.Value()), 10)
+		}
 
+		if err == nil {
 			err = utils.ExpectEqual(
 				utils.CasperT,
 				"public_key",
@@ -181,8 +196,8 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		if err == nil {
 			var delegators *jsonquery.Node
 			var delegatee *jsonquery.Node
-			delegators, err = jsonquery.Query(bidsNode.FirstChild, "/bid/delegators")
-			delegatee, err = jsonquery.Query(delegators.FirstChild, "/delegatee")
+			delegators, _ = jsonquery.Query(bidsNode.FirstChild, "/bid/delegators")
+			delegatee, _ = jsonquery.Query(delegators.FirstChild, "/delegatee")
 
 			err = utils.ExpectEqual(
 				utils.CasperT,
@@ -194,8 +209,8 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		if err == nil {
 			var delegators *jsonquery.Node
 			var publicKey *jsonquery.Node
-			delegators, err = jsonquery.Query(bidsNode.FirstChild, "/bid/delegators")
-			publicKey, err = jsonquery.Query(delegators.FirstChild, "/public_key")
+			delegators, _ = jsonquery.Query(bidsNode.FirstChild, "/bid/delegators")
+			publicKey, _ = jsonquery.Query(delegators.FirstChild, "/public_key")
 
 			err = utils.ExpectEqual(
 				utils.CasperT,
@@ -207,8 +222,8 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 		if err == nil {
 			var delegators *jsonquery.Node
 			var stakedAmount *jsonquery.Node
-			delegators, err = jsonquery.Query(bidsNode.FirstChild, "/bid/delegators")
-			stakedAmount, err = jsonquery.Query(delegators.FirstChild, "/staked_amount")
+			delegators, _ = jsonquery.Query(bidsNode.FirstChild, "/bid/delegators")
+			stakedAmount, _ = jsonquery.Query(delegators.FirstChild, "/staked_amount")
 			val := big.Int{}
 			val.SetString(fmt.Sprintf("%v", stakedAmount.Value()), 10)
 
@@ -223,14 +238,15 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the state_get_auction_info_result action_state has valid era validators$`, func() error {
-
 		validatorsNode, err := utils.GetNodeByJsonPath(jsonAuctionInfo, "/result/auction_state/era_validators")
 
-		err = utils.ExpectEqual(
-			utils.CasperT,
-			"bids length",
-			len(auctionInfo.AuctionState.EraValidators),
-			len(validatorsNode.ChildNodes()))
+		if err == nil {
+			err = utils.ExpectEqual(
+				utils.CasperT,
+				"bids length",
+				len(auctionInfo.AuctionState.EraValidators),
+				len(validatorsNode.ChildNodes()))
+		}
 
 		if err == nil {
 			eraId := jsonquery.FindOne(validatorsNode.FirstChild, "/era_id")

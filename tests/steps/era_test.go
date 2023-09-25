@@ -3,13 +3,15 @@ package steps
 import (
 	"context"
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/antchfx/jsonquery"
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
+
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
-	"strings"
-	"testing"
 )
 
 // Step Definitions for the eras.feature
@@ -23,7 +25,7 @@ func InitializeEraFeature(ctx *godog.ScenarioContext) {
 	var latest rpc.ChainGetBlockResult
 	var doc *jsonquery.Node
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
@@ -41,7 +43,6 @@ func InitializeEraFeature(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^request the era summary via the node$`, func() error {
-
 		summary, err := utils.GetEraSummary(latest.Block.Hash.String())
 
 		if len(summary) == 0 {
@@ -63,7 +64,7 @@ func InitializeEraFeature(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the era of the returned era summary is equal to the era of the returned test node era summary$`,
 		func() error {
-			var eraId = jsonquery.FindOne(doc, "result/era_summary/era_id").Value()
+			eraId := jsonquery.FindOne(doc, "result/era_summary/era_id").Value()
 			return utils.ExpectEqual(utils.CasperT, "era_id", float64(eraInfo.EraSummary.EraID), eraId)
 		},
 	)
@@ -82,22 +83,20 @@ func InitializeEraFeature(ctx *godog.ScenarioContext) {
 		})
 
 	ctx.Step(`^the delegators data of the returned era summary is equal to the delegators data of the returned test node era summary$`, func() error {
-
 		if eraInfo.EraSummary.StoredValue.EraInfo == nil {
 			return fmt.Errorf("MissingeraInfo.EraSummary.StoredValue.EraInfo")
 		}
 
-		var delegators = jsonquery.FindOne(doc, "result/era_summary/stored_value/EraInfo/seigniorage_allocations").ChildNodes()
+		delegators := jsonquery.FindOne(doc, "result/era_summary/stored_value/EraInfo/seigniorage_allocations").ChildNodes()
 		return utils.ExpectEqual(utils.CasperT, "delegators", len(eraInfo.EraSummary.StoredValue.EraInfo.SeigniorageAllocations), len(delegators))
 	})
 
 	ctx.Step(`^the validators data of the returned era summary is equal to the validators data of the returned test node era summary$`, func() error {
-
 		if eraInfo.EraSummary.StoredValue.EraInfo == nil {
 			return fmt.Errorf("MissingeraInfo.EraSummary.StoredValue.EraInfo")
 		}
 
-		var validators = jsonquery.FindOne(doc, "result/era_summary/stored_value/EraInfo/seigniorage_allocations").ChildNodes()
+		validators := jsonquery.FindOne(doc, "result/era_summary/stored_value/EraInfo/seigniorage_allocations").ChildNodes()
 		return utils.ExpectEqual(utils.CasperT, "validators", len(eraInfo.EraSummary.StoredValue.EraInfo.SeigniorageAllocations), len(validators))
 	})
 }

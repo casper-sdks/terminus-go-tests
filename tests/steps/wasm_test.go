@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/make-software/casper-go-sdk/types/key"
 	"math/big"
 	"os"
 	"strings"
@@ -18,6 +17,7 @@ import (
 	"github.com/make-software/casper-go-sdk/rpc"
 	"github.com/make-software/casper-go-sdk/types"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
+	"github.com/make-software/casper-go-sdk/types/key"
 	"github.com/make-software/casper-go-sdk/types/keypair"
 
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
@@ -36,7 +36,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 	var stateRootHash string
 	var contractHash string
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
@@ -58,6 +58,10 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 		var err error
 
 		faucetKey, err = casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
+
+		if err != nil {
+			return err
+		}
 
 		header := types.DefaultHeader()
 		header.ChainName = "casper-net-1"
@@ -105,6 +109,9 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the account named keys contain the "([^"]*)" name$`, func(name string) error {
 		var stateResult rpc.QueryGlobalStateResult
 		latest, err := sdk.GetStateRootHashLatest(context.Background())
+		if err != nil {
+			return err
+		}
 
 		accountHash := "account-hash-" + faucetKey.PublicKey().AccountHash().String()
 		stateRootHash = latest.StateRootHash.String()
@@ -135,11 +142,14 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the contract data "([^"]*)" is a "([^"]*)" with a value of "([^"]*)" and bytes of "([^"]*)"$`,
 		func(path string, typeName string, value string, hexBytes string) error {
-
 			var paths []string
 			paths = append(paths, path)
+			var bytes []byte
 
 			stateItem, err := sdk.QueryGlobalStateByStateHash(context.Background(), &stateRootHash, contractHash, paths)
+			if err != nil {
+				return err
+			}
 
 			clValue, err := stateItem.StoredValue.CLValue.Value()
 
@@ -151,7 +161,9 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 				err = utils.ExpectEqual(utils.CasperT, "value", clValue.String(), value)
 			}
 
-			bytes, err := stateItem.StoredValue.CLValue.Bytes()
+			if err == nil {
+				bytes, err = stateItem.StoredValue.CLValue.Bytes()
+			}
 
 			if err == nil {
 				strBytes := hex.EncodeToString(bytes)
@@ -163,8 +175,10 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the contract entry point is invoked with a transfer amount of "([^"]*)"$`,
 		func(transferAmount string) error {
-
 			recipient, err := keypair.GeneratePrivateKey(keypair.ED25519)
+			if err != nil {
+				return err
+			}
 
 			hash, err := casper.NewContractHash(strings.Split(contractHash, "-")[1])
 
@@ -210,7 +224,6 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 	)
 
 	ctx.Step(`^the contract invocation deploy is successful$`, func() error {
-
 		deploy, err := utils.WaitForDeploy(wasmDeployResult.DeployHash.String(), 300)
 
 		if len(deploy.ExecutionResults) == 0 {
@@ -221,7 +234,6 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the the contract is invoked by name "([^"]*)" and a transfer amount of "([^"]*)"$`,
 		func(contractName string, transferAmount string) error {
-
 			recipient, err := keypair.GeneratePrivateKey(keypair.ED25519)
 
 			if err == nil {
@@ -266,7 +278,6 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the the contract is invoked by hash and version with a transfer amount of "([^"]*)"$`,
 		func(transferAmount string) error {
-
 			recipient, err := keypair.GeneratePrivateKey(keypair.ED25519)
 
 			if err == nil {
@@ -274,6 +285,10 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 				var version json.Number = "1"
 				var hash key.ContractHash
 				hash, err = casper.NewContractHash(strings.Split(contractHash, "-")[1])
+
+				if err != nil {
+					return err
+				}
 
 				header := types.DefaultHeader()
 				header.ChainName = "casper-net-1"
@@ -315,7 +330,6 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^the the contract is invoked by name "([^"]*)" and version with a transfer amount of "([^"]*)"$`,
 		func(contractName string, transferAmount string) error {
-
 			recipient, err := keypair.GeneratePrivateKey(keypair.ED25519)
 
 			if err == nil {

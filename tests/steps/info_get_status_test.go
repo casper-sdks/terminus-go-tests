@@ -3,13 +3,15 @@ package steps
 import (
 	"context"
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
+
+	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 // The test features implementation for the info_get_peers.feature
@@ -18,37 +20,34 @@ func TestFeaturesInfoGetStatus(t *testing.T) {
 }
 
 func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
-
 	var sdk casper.RPCClient
 	var infoGetStatusResult rpc.InfoGetStatusResult
-	var nctlGetStatus = casper.InfoGetStatusResult{}
+	nctlGetStatus := casper.InfoGetStatusResult{}
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
 	})
 
 	ctx.Step(`^that the info_get_status is invoked against nctl$`, func() error {
-
-		err := utils.Pass
+		var err error
 
 		infoGetStatusResult, err = sdk.GetStatus(context.Background())
 
-		nctlGetStatus, err = utils.GetNodeStatus(1)
+		if err == nil {
+			nctlGetStatus, err = utils.GetNodeStatus(1)
+		}
 
 		return err
 	})
 
 	ctx.Step(`^an info_get_status_result is returned`, func() error {
-
 		assert.NotNil(utils.CasperT, infoGetStatusResult, "infoGetStatusResult is nil")
-
 		return utils.Pass
 	})
 
 	ctx.Step(`^the info_get_status_result api_version is "([^"]*)"$`, func(apiVersion string) error {
-
 		if apiVersion != infoGetStatusResult.APIVersion {
 			return fmt.Errorf("expected %s ApiVersion to be %s", infoGetStatusResult.APIVersion, apiVersion)
 		}
@@ -56,7 +55,6 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the info_get_status_result chainspec_name is "([^"]*)"$`, func(chainSpecName string) error {
-
 		if chainSpecName != infoGetStatusResult.ChainSpecName {
 			return fmt.Errorf("expected %s ChainSpecName to be %s", infoGetStatusResult.ChainSpecName, chainSpecName)
 		}
@@ -65,7 +63,6 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid last_added_block_info$`, func() error {
-
 		err := utils.ExpectEqual(utils.CasperT, "hash", infoGetStatusResult.LastAddedBlockInfo.Hash, nctlGetStatus.LastAddedBlockInfo.Hash)
 
 		if err == nil {
@@ -108,7 +105,6 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the info_get_status_result has a valid uptime$`, func() error {
-
 		if !strings.HasSuffix(infoGetStatusResult.Uptime, "ms") {
 			return fmt.Errorf("missing ms from uptime %s", infoGetStatusResult.Uptime)
 		}
