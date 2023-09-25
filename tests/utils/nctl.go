@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/acarl005/stripansi"
-	"github.com/antchfx/jsonquery"
-	"github.com/make-software/casper-go-sdk/casper"
 	"io"
 	"log"
 	"math/big"
@@ -14,11 +11,15 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/acarl005/stripansi"
+	"github.com/antchfx/jsonquery"
+	"github.com/make-software/casper-go-sdk/casper"
+	"github.com/make-software/casper-go-sdk/types/keypair"
 )
 
 // Steps for the state_get_auction_info.feature
 func GetNctlLatestBlock() (casper.Block, error) {
-
 	block := casper.Block{}
 
 	res, err := nctlExec("view_chain_block.sh", "")
@@ -33,7 +34,6 @@ func GetNctlLatestBlock() (casper.Block, error) {
 }
 
 func GetNodeStatus(nodeId int) (casper.InfoGetStatusResult, error) {
-
 	res, err := nctlExec("view_node_status.sh", fmt.Sprintf("node=%d", nodeId))
 
 	index := strings.Index(res, "{")
@@ -53,7 +53,6 @@ func GetStateRootHash(nodeId int) (string, error) {
 	srh := strings.Split(result, "=")[1]
 	srh = strings.TrimSpace(srh)
 	return srh, err
-
 }
 
 func GetAccountHash(publicKey string, blockHash string) (string, error) {
@@ -62,7 +61,7 @@ func GetAccountHash(publicKey string, blockHash string) (string, error) {
 }
 
 func StateGetBalance(stateRootHash string, purseUref string) (big.Int, error) {
-	var balance = new(big.Int)
+	balance := new(big.Int)
 
 	params := fmt.Sprintf("{\"state_root_hash\":\"%s\",\"purse_uref\":\"%s\"}", stateRootHash, purseUref)
 	jsonStr, _ := simpleRcp("state_get_balance", params)
@@ -95,14 +94,12 @@ func GetNodeByJsonPath(jsonStr string, path string) (*jsonquery.Node, error) {
 }
 
 func GetStateAccountInfo(publicKey string, blockHash string) (string, error) {
-
 	params := fmt.Sprintf("{\"public_key\":\"%s\",\"block_identifier\":{\"Hash\":\"%s\"}}", publicKey, blockHash)
 
 	return simpleRcp("state_get_account_info", params)
 }
 
 func GetEraSummary(blockHash string) (string, error) {
-
 	params := fmt.Sprintf("[{\"Hash\":\"%s\"}]", blockHash)
 
 	return simpleRcp("chain_get_era_summary", params)
@@ -111,6 +108,11 @@ func GetEraSummary(blockHash string) (string, error) {
 func GetAuctionInfoByHash(hash string) (string, error) {
 	auctionInfoJson, err := simpleRcp("state_get_auction_info", fmt.Sprintf("[{\"Hash\": \"%s\"}]", hash))
 	return auctionInfoJson, err
+}
+
+func QueryBalanceByPublicKey(publicKey keypair.PublicKey) (string, error) {
+	params := fmt.Sprintf("{\"purse_identifier\":{\"main_purse_under_public_key\":\"%s\"}}", publicKey.ToHex())
+	return simpleRcp("query_balance", params)
 }
 
 func simpleRcp(method string, params string) (string, error) {
@@ -145,7 +147,6 @@ func simpleRcp(method string, params string) (string, error) {
 }
 
 func nctlExec(command string, params string) (string, error) {
-
 	docker := fmt.Sprintf("%v", config["docker-name"])
 	cmd := fmt.Sprintf("docker exec  -t %s /bin/bash -c 'source casper-node/utils/nctl/sh/views/%s %s'", docker, command, params)
 
