@@ -38,7 +38,7 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 	var faucetKey keypair.PrivateKey
 	var receiverKey keypair.PrivateKey
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
@@ -57,24 +57,25 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 			msg := []byte("this is the sender")
 			sign, err := senderKey.Sign(msg)
 			if err == nil {
-				err = senderKey.PublicKey().VerifySignature(msg, sign)
+				return senderKey.PublicKey().VerifySignature(msg, sign)
 			}
 		}
 
 		return err
 	})
 
-	ctx.Step(`^fund the account from the faucet user with a transfer amount of (\d+) and a payment amount of (\d+)$`, func(transfer int64, payment int64) error {
-		var err error
+	ctx.Step(`^fund the account from the faucet user with a transfer amount of (\d+) and a payment amount of (\d+)$`,
+		func(transfer int64, payment int64) error {
+			var err error
 
-		faucetKey, err = casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
+			faucetKey, err = casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
 
-		if err == nil {
-			err = doDeploy(sdk, faucetKey, senderKey.PublicKey(), transfer, payment)
-		}
+			if err == nil {
+				err = doDeploy(sdk, faucetKey, senderKey.PublicKey(), transfer, payment)
+			}
 
-		return err
-	})
+			return err
+		})
 
 	ctx.Step(`^wait for a block added event with a timeout of (\d+) seconds$`, func(timeoutSeconds int) error {
 		_, err := utils.WaitForBlockAdded(keysDeployResult.DeployHash.String(), timeoutSeconds)

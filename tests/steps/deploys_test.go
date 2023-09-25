@@ -13,7 +13,6 @@ import (
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
-	"github.com/make-software/casper-go-sdk/sse"
 	"github.com/make-software/casper-go-sdk/types"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
 	"github.com/make-software/casper-go-sdk/types/clvalue/cltype"
@@ -45,7 +44,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	var transferAmount *big.Int
 	var gasPrice int
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
@@ -151,10 +150,9 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy response contains a valid deploy hash of length (\d+) and an API version "([^"]*)"$`, func(hashLength int, apiVersion string) error {
-		err := utils.Pass
 		assert.NotNil(utils.CasperT, putDeployResult, "PutDeployResult")
 
-		err = utils.ExpectEqual(utils.CasperT, "putDeployResult.DeployHash", len(putDeployResult.DeployHash.String()), hashLength)
+		err := utils.ExpectEqual(utils.CasperT, "putDeployResult.DeployHash", len(putDeployResult.DeployHash.String()), hashLength)
 
 		if err == nil {
 			err = utils.ExpectEqual(utils.CasperT, "putDeployResult.ApiVersion", putDeployResult.ApiVersion, apiVersion)
@@ -164,9 +162,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^wait for a block added event with a timeout of (\d+) seconds$`, func(timeoutSeconds int) error {
-		err := utils.Pass
-		var blockAddedEvent sse.BlockAddedEvent
-		blockAddedEvent, err = utils.WaitForBlockAdded(putDeployResult.DeployHash.String(), timeoutSeconds)
+		blockAddedEvent, err := utils.WaitForBlockAdded(putDeployResult.DeployHash.String(), timeoutSeconds)
 
 		if err == nil {
 			blockHash = blockAddedEvent.BlockAdded.BlockHash
@@ -243,7 +239,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 			putDeploy.Header.BodyHash.String())
 	})
 
-	ctx.Step(`^the deploy has a session type of "([^"]*)"$`, func(sessionType string) error {
+	ctx.Step(`^the deploy has a session type of "([^"]*)"$`, func(_ string) error {
 		if infoGetDeployResult.Deploy.Session.Transfer == nil {
 			return errors.New("missing transfer")
 		}
@@ -251,7 +247,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the deploy is approved by user-(\d+)$`, func(userId int) error {
+	ctx.Step(`^the deploy is approved by user-(\d+)$`, func(_ int) error {
 		approval := infoGetDeployResult.Deploy.Approvals[0]
 		return utils.ExpectEqual(utils.CasperT, "approval", approval.Signer.String(), senderKey.PublicKey().String())
 	})
@@ -284,7 +280,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		return err
 	})
 
-	ctx.Step(`^the deploy session has a "([^"]*)" argument with the public key of user-(\d+)$`, func(name string, userId int) error {
+	ctx.Step(`^the deploy session has a "([^"]*)" argument with the public key of user-(\d+)$`, func(name string, _ int) error {
 		parameter, err := infoGetDeployResult.Deploy.Session.Transfer.Args.Find(name)
 
 		if err == nil {

@@ -37,7 +37,7 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 	var stateRootHash rpc.ChainGetStateRootHashResult
 	var expectedErr rpc.RpcError
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
@@ -240,5 +240,9 @@ func createTransfer(sdk casper.RPCClient) (rpc.PutDeployResult, error) {
 		fmt.Println(string(deployJson))
 	}
 
-	return sdk.PutDeploy(context.Background(), *deploy)
+	if err == nil {
+		return sdk.PutDeploy(context.Background(), *deploy)
+	}
+
+	return rpc.PutDeployResult{}, err
 }

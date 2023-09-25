@@ -6,12 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/make-software/casper-go-sdk/casper"
-	"github.com/make-software/casper-go-sdk/rpc"
-	"github.com/make-software/casper-go-sdk/types"
-	"github.com/make-software/casper-go-sdk/types/clvalue"
-	"github.com/make-software/casper-go-sdk/types/keypair"
-	"github.com/stretchr/testify/assert"
 	"math/big"
 	"math/rand"
 	"strings"
@@ -19,6 +13,13 @@ import (
 	"time"
 
 	"github.com/cucumber/godog"
+	"github.com/make-software/casper-go-sdk/casper"
+	"github.com/make-software/casper-go-sdk/rpc"
+	"github.com/make-software/casper-go-sdk/types"
+	"github.com/make-software/casper-go-sdk/types/clvalue"
+	"github.com/make-software/casper-go-sdk/types/keypair"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
@@ -37,14 +38,13 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 	var clValuesDeployResult rpc.PutDeployResult
 	var clValuesInfoGetDeployResult casper.InfoGetDeployResult
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
 	})
 
 	ctx.Step(`^that a CL value of type "([^"]*)" has a value of "([^"]*)"$`, func(typeName string, value string) error {
-
 		clVal, err := utils.CreateValue(typeName, value)
 		testArgs.AddArgument(typeName, *clVal)
 		lastVal = *clVal
@@ -61,7 +61,6 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`^that the CL complex value of type "([^"]*)" with an internal types of "([^"]*)" values of "([^"]*)"$`,
 		func(typeName string, internalTypes string, values string) error {
-
 			clVal, err := utils.CreateComplexValue(typeName, strings.Split(internalTypes, ","), strings.Split(values, ","))
 			testArgs.AddArgument(typeName, *clVal)
 			lastVal = *clVal
@@ -69,14 +68,20 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 		})
 
 	ctx.Step(`^the values are added as arguments to a deploy$`, func() error {
-
 		keyPath := utils.GetUserKeyAssetPath(1, 1, "secret_key.pem")
 
 		senderKey, err := casper.NewED25519PrivateKeyFromPEMFile(keyPath)
+		if err != nil {
+			return err
+		}
+
 		keyPath = utils.GetUserKeyAssetPath(1, 2, "secret_key.pem")
 
 		var receiverPrivateKey keypair.PrivateKey
 		receiverPrivateKey, err = casper.NewED25519PrivateKeyFromPEMFile(keyPath)
+		if err != nil {
+			return err
+		}
 
 		header := types.DefaultHeader()
 		header.ChainName = "casper-net-1"
@@ -90,7 +95,8 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 		args.AddArgument("id", clvalue.NewCLOption(*clvalue.NewCLUInt64(rand.Uint64())))
 
 		var name string
-		var val = clvalue.CLValue{}
+		var val clvalue.CLValue
+
 		for _, arg := range *testArgs {
 			name, err = arg.Name()
 			if err != nil {
@@ -135,17 +141,19 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy is put on chain$`, func() error {
-
 		result, err := sdk.PutDeploy(context.Background(), *clValuesDeploy)
 		clValuesDeployResult = result
 		return err
 	})
 
-	ctx.Step(`^the deploy response contains a valid deploy hash of length (\d+) and an API version "([^"]*)"$`, func(hashLength int, apiVersion string) error {
-
-		err := utils.ExpectEqual(utils.CasperT, "API", clValuesDeployResult.ApiVersion, apiVersion)
-		return err
-	})
+	ctx.Step(`^the deploy response contains a valid deploy hash of length (\d+) and an API version "([^"]*)"$`,
+		func(hashLength int, apiVersion string) error {
+			err := utils.ExpectEqual(utils.CasperT, "API", clValuesDeployResult.ApiVersion, apiVersion)
+			if err == nil {
+				err = utils.ExpectEqual(utils.CasperT, "hashLength", len(clValuesDeployResult.DeployHash.String()), hashLength)
+			}
+			return err
+		})
 
 	ctx.Step(`^the deploy has successfully executed$`, func() error {
 		_, err := utils.WaitForBlockAdded(clValuesDeployResult.DeployHash.String(), 300)
@@ -157,7 +165,8 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the deploy is obtained from the node$`, func() error {
-		err := utils.Pass
+		var err error
+
 		clValuesInfoGetDeployResult, err = utils.WaitForDeploy(clValuesDeployResult.DeployHash.String(), 300)
 
 		if clValuesInfoGetDeployResult.Deploy.Hash.String() != clValuesDeployResult.DeployHash.String() {
@@ -166,42 +175,56 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 		return err
 	})
 
-	ctx.Step(`^the deploys NamedArgument "([^"]*)" has a value of "([^"]*)" and bytes of "([^"]*)"$`, func(name string, strVal string, hexBytes string) error {
+	ctx.Step(`^the deploys NamedArgument "([^"]*)" has a value of "([^"]*)" and bytes of "([^"]*)"$`,
+		func(name string, strVal string, hexBytes string) error {
+			args := clValuesInfoGetDeployResult.Deploy.Session.Transfer.Args
 
-		args := clValuesInfoGetDeployResult.Deploy.Session.Transfer.Args
-
-		arg, err := args.Find(name)
-		var expectedValue *clvalue.CLValue
-		expectedValue, err = utils.CreateValue(name, strVal)
-
-		if err == nil {
+			arg, err := args.Find(name)
+			var expectedValue *clvalue.CLValue
 			var value clvalue.CLValue
-			value, err = arg.Value()
 
-			err = utils.ExpectEqual(utils.CasperT, "value", value.GetValueByType(), expectedValue.GetValueByType())
+			if err == nil {
+				expectedValue, err = utils.CreateValue(name, strVal)
+			}
+
+			if err == nil {
+				value, err = arg.Value()
+			}
+
+			if err == nil {
+				err = utils.ExpectEqual(utils.CasperT, "value", value.GetValueByType(), expectedValue.GetValueByType())
+			}
+
 			if err == nil {
 				err = utils.ExpectEqual(utils.CasperT, "bytes", hex.EncodeToString(value.Bytes()), hexBytes)
 			}
-		}
-		return err
-	})
+
+			return err
+		})
 
 	ctx.Step(`^the deploys NamedArgument Complex value "([^"]*)" has internal types of "([^"]*)" and values of "([^"]*)" and bytes of "([^"]*)"$`,
 		func(name string, internalTypes string, values string, hexBytes string) error {
 			var value clvalue.CLValue
+			var expectedValue *clvalue.CLValue
+
 			args := clValuesInfoGetDeployResult.Deploy.Session.Transfer.Args
 			arg, err := args.Find(name)
-			value, err = arg.Value()
+			if err == nil {
+				value, err = arg.Value()
+			}
 
 			if err == nil {
 				err = utils.ExpectEqual(utils.CasperT, "bytes", hex.EncodeToString(value.Bytes()), hexBytes)
 			}
 
-			var expectedValue *clvalue.CLValue
-			expectedValue, err = utils.CreateComplexValue(name, strings.Split(internalTypes, ","), strings.Split(values, ","))
+			if err == nil {
+				expectedValue, err = utils.CreateComplexValue(name, strings.Split(internalTypes, ","), strings.Split(values, ","))
+			}
+
 			if err == nil {
 				err = utils.ExpectEqual(utils.CasperT, "value", value.GetValueByType().String(), expectedValue.GetValueByType().String())
 			}
+
 			return err
 		})
 }

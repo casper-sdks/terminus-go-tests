@@ -24,14 +24,14 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 	var infoGetStatusResult rpc.InfoGetStatusResult
 	nctlGetStatus := casper.InfoGetStatusResult{}
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
 	})
 
 	ctx.Step(`^that the info_get_status is invoked against nctl$`, func() error {
-		err := utils.Pass
+		var err error
 
 		infoGetStatusResult, err = sdk.GetStatus(context.Background())
 

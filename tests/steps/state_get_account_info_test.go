@@ -27,7 +27,7 @@ func InitializeStateGetAccountInfoFeature(ctx *godog.ScenarioContext) {
 	var senderKey keypair.PrivateKey
 	var accountInfoJson string
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil

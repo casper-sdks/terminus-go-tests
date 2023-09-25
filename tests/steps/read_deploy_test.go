@@ -27,7 +27,7 @@ func TestFeaturesReadDeploy(t *testing.T) {
 func InitializeReadDeploy(ctx *godog.ScenarioContext) {
 	var deploy types.Deploy
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		return ctx, nil
 	})

@@ -3,12 +3,14 @@ package steps
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 	"github.com/stretchr/testify/assert"
-	"testing"
+
+	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 // The test features implementation for the info_get_validator_changes.feature
@@ -17,19 +19,17 @@ func TestFeaturesInfoGetValidatorChanges(t *testing.T) {
 }
 
 func InitializeInfoGetValidatorChanges(ctx *godog.ScenarioContext) {
-
 	var sdk casper.RPCClient
 	var validatorChanges rpc.InfoGetValidatorChangesResult
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
 	})
 
 	ctx.Step(`^that the info_get_validator_changes method is invoked against a node$`, func() error {
-
-		err := utils.Pass
+		var err error
 
 		validatorChanges, err = sdk.GetValidatorChangesInfo(context.Background())
 
@@ -37,7 +37,6 @@ func InitializeInfoGetValidatorChanges(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^a valid info_get_validator_changes_result is returned$`, func() error {
-
 		assert.NotNil(utils.CasperT, validatorChanges, "validatorChanges is nil")
 
 		assert.NotNil(utils.CasperT, validatorChanges.Changes)
@@ -48,7 +47,6 @@ func InitializeInfoGetValidatorChanges(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`the info_get_validator_changes_result contains a valid API version$`, func() error {
-
 		apiVersion := "1.0.0"
 
 		if apiVersion != validatorChanges.APIVersion {

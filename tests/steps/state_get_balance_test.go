@@ -2,7 +2,6 @@ package steps
 
 import (
 	"context"
-	"errors"
 	"math/big"
 	"testing"
 
@@ -26,7 +25,7 @@ func InitializeStateGetBalance(ctx *godog.ScenarioContext) {
 	var latestBlock rpc.ChainGetBlockResult
 	var stateRootHash rpc.ChainGetStateRootHashResult
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
@@ -60,9 +59,6 @@ func InitializeStateGetBalance(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^a valid state_get_balance_result is returned$`, func() error {
-		if &balance == nil {
-			return errors.New("missing balance")
-		}
 		return utils.Pass
 	})
 

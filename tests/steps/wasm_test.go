@@ -36,7 +36,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 	var stateRootHash string
 	var contractHash string
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
@@ -144,6 +144,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 		func(path string, typeName string, value string, hexBytes string) error {
 			var paths []string
 			paths = append(paths, path)
+			var bytes []byte
 
 			stateItem, err := sdk.QueryGlobalStateByStateHash(context.Background(), &stateRootHash, contractHash, paths)
 			if err != nil {
@@ -160,7 +161,9 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 				err = utils.ExpectEqual(utils.CasperT, "value", clValue.String(), value)
 			}
 
-			bytes, err := stateItem.StoredValue.CLValue.Bytes()
+			if err == nil {
+				bytes, err = stateItem.StoredValue.CLValue.Bytes()
+			}
 
 			if err == nil {
 				strBytes := hex.EncodeToString(bytes)

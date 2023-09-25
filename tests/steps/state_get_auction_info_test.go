@@ -27,7 +27,7 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	var jsonAuctionInfo string
 	var rpcErr rpc.RpcError
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
@@ -36,7 +36,9 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	ctx.Step(`^that the state_get_auction_info RPC method is invoked by hash block identifier$`, func() error {
 		latest, err := sdk.GetBlockLatest(context.Background())
 
-		jsonAuctionInfo, err = utils.GetAuctionInfoByHash(latest.Block.Header.ParentHash.String())
+		if err == nil {
+			jsonAuctionInfo, err = utils.GetAuctionInfoByHash(latest.Block.Header.ParentHash.String())
+		}
 
 		if err == nil {
 			auctionInfo, err = sdk.GetAuctionInfoByHash(context.Background(), latest.Block.Header.ParentHash.String())
@@ -48,7 +50,9 @@ func InitializeStateAuctionInfoFeature(ctx *godog.ScenarioContext) {
 	ctx.Step(`^that the state_get_auction_info RPC method is invoked by height block identifier$`, func() error {
 		latest, err := sdk.GetBlockLatest(context.Background())
 
-		jsonAuctionInfo, err = utils.GetAuctionInfoByHash(latest.Block.Header.ParentHash.String())
+		if err == nil {
+			jsonAuctionInfo, err = utils.GetAuctionInfoByHash(latest.Block.Header.ParentHash.String())
+		}
 
 		if err == nil {
 			auctionInfo, err = sdk.GetAuctionInfoByHeight(context.Background(), latest.Block.Header.Height)

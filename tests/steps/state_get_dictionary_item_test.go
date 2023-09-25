@@ -22,7 +22,7 @@ func InitializeStateGetDictionaryItem(ctx *godog.ScenarioContext) {
 	var dictionaryItem rpc.StateGetDictionaryResult
 	var faucetAccountHash string
 
-	ctx.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
+	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		sdk = utils.GetSdk()
 		return ctx, nil
