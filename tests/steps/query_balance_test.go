@@ -40,7 +40,7 @@ func InitializeQueryGetBalance(ctx *godog.ScenarioContext) {
 			queryGetBalanceResult, err = sdk.QueryBalance(context.Background(), identifier)
 
 			if err == nil {
-				queryGetBalanceJson, err = utils.QueryBalanceByPublicKey(publicKey)
+				queryGetBalanceJson, err = utils.QueryBalance("main_purse_under_public_key", publicKey.ToHex())
 			}
 		}
 		return err
@@ -70,16 +70,48 @@ func InitializeQueryGetBalance(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that a query balance is obtained by main purse account hash$`, func() error {
-		var identifier rpc.PurseIdentifier
-		var err error
-		queryGetBalanceResult, err = sdk.QueryBalance(context.Background(), identifier)
+		faucetKey, err := casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
+
+		if err == nil {
+			accountHash := "account-hash-" + faucetKey.PublicKey().AccountHash().ToHex()
+			identifier := rpc.PurseIdentifier{
+				MainPurseUnderAccountHash: &accountHash,
+			}
+			queryGetBalanceResult, err = sdk.QueryBalance(context.Background(), identifier)
+
+			if err == nil {
+				queryGetBalanceJson, err = utils.QueryBalance("main_purse_under_account_hash", accountHash)
+			}
+		}
 		return err
 	})
 
 	ctx.Step(`^that a query balance is obtained by main purse uref$`, func() error {
-		var identifier rpc.PurseIdentifier
-		var err error
-		queryGetBalanceResult, err = sdk.QueryBalance(context.Background(), identifier)
+		var latest rpc.ChainGetBlockResult
+		var accountInfo rpc.StateGetAccountInfo
+
+		faucetKey, err := casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
+
+		if err == nil {
+			latest, err = sdk.GetBlockLatest(context.Background())
+		}
+
+		if err == nil {
+			accountInfo, err = sdk.GetAccountInfoByBlochHash(context.Background(), latest.Block.Hash.String(), faucetKey.PublicKey())
+		}
+
+		if err == nil {
+			purseUref := accountInfo.Account.MainPurse.String()
+			identifier := rpc.PurseIdentifier{
+				PurseUref: &purseUref,
+			}
+			queryGetBalanceResult, err = sdk.QueryBalance(context.Background(), identifier)
+
+			if err == nil {
+				queryGetBalanceJson, err = utils.QueryBalance("purse_uref", purseUref)
+			}
+		}
+
 		return err
 	})
 }

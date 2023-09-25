@@ -15,7 +15,6 @@ import (
 	"github.com/acarl005/stripansi"
 	"github.com/antchfx/jsonquery"
 	"github.com/make-software/casper-go-sdk/casper"
-	"github.com/make-software/casper-go-sdk/types/keypair"
 )
 
 // Steps for the state_get_auction_info.feature
@@ -23,6 +22,9 @@ func GetNctlLatestBlock() (casper.Block, error) {
 	block := casper.Block{}
 
 	res, err := nctlExec("view_chain_block.sh", "")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	err = json.Unmarshal([]byte(res), &block)
 
@@ -110,8 +112,8 @@ func GetAuctionInfoByHash(hash string) (string, error) {
 	return auctionInfoJson, err
 }
 
-func QueryBalanceByPublicKey(publicKey keypair.PublicKey) (string, error) {
-	params := fmt.Sprintf("{\"purse_identifier\":{\"main_purse_under_public_key\":\"%s\"}}", publicKey.ToHex())
+func QueryBalance(purseIdentifierName string, identifier string) (string, error) {
+	params := fmt.Sprintf("{\"purse_identifier\":{\"%s\":\"%s\"}}", purseIdentifierName, identifier)
 	return simpleRcp("query_balance", params)
 }
 
@@ -122,6 +124,10 @@ func simpleRcp(method string, params string) (string, error) {
 	bufferString := bytes.NewBufferString(payload)
 
 	request, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%v:%v/rpc", config["host-name"], config["port-rcp"]), bufferString)
+	if err != nil {
+		return "", err
+	}
+
 	request.Header.Add("Content-Type", "application/json")
 
 	client := http.Client{
@@ -133,7 +139,7 @@ func simpleRcp(method string, params string) (string, error) {
 	response, err = client.Do(request)
 
 	if err == nil {
-		if response == nil && response.StatusCode != http.StatusOK {
+		if response.StatusCode != http.StatusOK {
 			err = fmt.Errorf("invalid response %d", response.StatusCode)
 		} else {
 			bodyBytes, err := io.ReadAll(response.Body)
