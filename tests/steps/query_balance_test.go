@@ -13,7 +13,7 @@ import (
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
-// Step Definitions for the query_balanc.feature
+// Step Definitions for the query_balance.feature
 func TestFeaturesQueryGetBalance(t *testing.T) {
 	utils.TestFeatures(t, "query_balance.feature", InitializeQueryGetBalance)
 }
