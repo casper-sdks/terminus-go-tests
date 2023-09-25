@@ -160,10 +160,6 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 		return err
 	})
 
-	ctx.Step(`^the deploy data has an API version of "([^"]*)"$`, func(apiVersion string) error {
-		return utils.NotImplementError
-	})
-
 	ctx.Step(`^the deploy is obtained from the node$`, func() error {
 		var err error
 
