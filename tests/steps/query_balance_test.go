@@ -114,4 +114,32 @@ func InitializeQueryGetBalance(ctx *godog.ScenarioContext) {
 
 		return err
 	})
+
+	ctx.Step(`^a transfer of (\d+) is made to user-(\d+)'s purse$`, func(amount int, userId int) error {
+		return utils.NotImplementError
+	})
+
+	ctx.Step(`^that a query balance is obtained by user-(\d+)'s main purse public and latest block identifier$`, func(userId int) error {
+		return utils.NotImplementError
+	})
+
+	ctx.Step(`^the balance includes the transferred amount$`, func() error {
+		return utils.NotImplementError
+	})
+
+	ctx.Step(`^that a query balance is obtained by user-1's main purse public key and previous block identifier$`, func() error {
+		return utils.NotImplementError
+	})
+
+	ctx.Step(`^the balance is the pre transfer amount$`, func() error {
+		return utils.NotImplementError
+	})
+
+	ctx.Step(`^that a query balance is obtained by user-1's main purse public and latest state root hash identifier$`, func() error {
+		return utils.NotImplementError
+	})
+
+	ctx.Step(`^that a query balance is obtained by user-1's main purse public key and previous state root hash identifier$`, func() error {
+		return utils.NotImplementError
+	})
 }
