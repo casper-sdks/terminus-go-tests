@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/acarl005/stripansi"
-	"github.com/antchfx/jsonquery"
-	"github.com/make-software/casper-go-sdk/casper"
 	"io"
 	"log"
 	"math/big"
@@ -14,14 +11,20 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/acarl005/stripansi"
+	"github.com/antchfx/jsonquery"
+	"github.com/make-software/casper-go-sdk/casper"
 )
 
 // Steps for the state_get_auction_info.feature
 func GetNctlLatestBlock() (casper.Block, error) {
-
 	block := casper.Block{}
 
 	res, err := nctlExec("view_chain_block.sh", "")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	err = json.Unmarshal([]byte(res), &block)
 
@@ -33,7 +36,6 @@ func GetNctlLatestBlock() (casper.Block, error) {
 }
 
 func GetNodeStatus(nodeId int) (casper.InfoGetStatusResult, error) {
-
 	res, err := nctlExec("view_node_status.sh", fmt.Sprintf("node=%d", nodeId))
 
 	index := strings.Index(res, "{")
@@ -53,7 +55,6 @@ func GetStateRootHash(nodeId int) (string, error) {
 	srh := strings.Split(result, "=")[1]
 	srh = strings.TrimSpace(srh)
 	return srh, err
-
 }
 
 func GetAccountHash(publicKey string, blockHash string) (string, error) {
@@ -62,7 +63,7 @@ func GetAccountHash(publicKey string, blockHash string) (string, error) {
 }
 
 func StateGetBalance(stateRootHash string, purseUref string) (big.Int, error) {
-	var balance = new(big.Int)
+	balance := new(big.Int)
 
 	params := fmt.Sprintf("{\"state_root_hash\":\"%s\",\"purse_uref\":\"%s\"}", stateRootHash, purseUref)
 	jsonStr, _ := simpleRcp("state_get_balance", params)
@@ -95,14 +96,12 @@ func GetNodeByJsonPath(jsonStr string, path string) (*jsonquery.Node, error) {
 }
 
 func GetStateAccountInfo(publicKey string, blockHash string) (string, error) {
-
 	params := fmt.Sprintf("{\"public_key\":\"%s\",\"block_identifier\":{\"Hash\":\"%s\"}}", publicKey, blockHash)
 
 	return simpleRcp("state_get_account_info", params)
 }
 
 func GetEraSummary(blockHash string) (string, error) {
-
 	params := fmt.Sprintf("[{\"Hash\":\"%s\"}]", blockHash)
 
 	return simpleRcp("chain_get_era_summary", params)
@@ -113,6 +112,11 @@ func GetAuctionInfoByHash(hash string) (string, error) {
 	return auctionInfoJson, err
 }
 
+func QueryBalance(purseIdentifierName string, identifier string) (string, error) {
+	params := fmt.Sprintf("{\"purse_identifier\":{\"%s\":\"%s\"}}", purseIdentifierName, identifier)
+	return simpleRcp("query_balance", params)
+}
+
 func simpleRcp(method string, params string) (string, error) {
 	var nctlJson string
 	id := time.Now().UnixMilli()
@@ -120,6 +124,10 @@ func simpleRcp(method string, params string) (string, error) {
 	bufferString := bytes.NewBufferString(payload)
 
 	request, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%v:%v/rpc", config["host-name"], config["port-rcp"]), bufferString)
+	if err != nil {
+		return "", err
+	}
+
 	request.Header.Add("Content-Type", "application/json")
 
 	client := http.Client{
@@ -131,7 +139,7 @@ func simpleRcp(method string, params string) (string, error) {
 	response, err = client.Do(request)
 
 	if err == nil {
-		if response == nil && response.StatusCode != http.StatusOK {
+		if response.StatusCode != http.StatusOK {
 			err = fmt.Errorf("invalid response %d", response.StatusCode)
 		} else {
 			bodyBytes, err := io.ReadAll(response.Body)
@@ -145,7 +153,6 @@ func simpleRcp(method string, params string) (string, error) {
 }
 
 func nctlExec(command string, params string) (string, error) {
-
 	docker := fmt.Sprintf("%v", config["docker-name"])
 	cmd := fmt.Sprintf("docker exec  -t %s /bin/bash -c 'source casper-node/utils/nctl/sh/views/%s %s'", docker, command, params)
 
