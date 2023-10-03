@@ -6,4 +6,4 @@ Feature: speculative_execution
     And the speculative_exec has an api_version of "1.0.0"
     And the speculative_exec has a valid block_hash
     And the speculative_exec has a valid execution_results
-    And the execution_results contains a cost of 123456
+    And the execution_results contains a cost of 100000000

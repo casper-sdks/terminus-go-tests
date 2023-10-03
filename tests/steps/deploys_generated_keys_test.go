@@ -112,13 +112,7 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 	})
 }
 
-func doDeploy(sdk casper.RPCClient,
-
-	faucet keypair.PrivateKey,
-	receiverKey keypair.PublicKey,
-	transfer int64,
-	payment int64,
-) error {
+func doDeploy(sdk casper.RPCClient, faucet keypair.PrivateKey, receiverKey keypair.PublicKey, transfer int64, payment int64) error {
 	var deployJson []byte
 	header := types.DefaultHeader()
 	header.ChainName = "casper-net-1"
