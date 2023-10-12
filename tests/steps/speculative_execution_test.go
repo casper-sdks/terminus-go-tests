@@ -8,6 +8,7 @@ import (
 	"github.com/make-software/casper-go-sdk/types/keypair"
 	"math/big"
 	"math/rand"
+	"strings"
 	"testing"
 	"time"
 
@@ -29,14 +30,14 @@ func TestFeaturesSpeculativeExecution(t *testing.T) {
 
 func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 	var speculativeExecClient *rpc.SpeculativeClient
-	//var casperClient casper.RPCClient
+	var casperClient casper.RPCClient
 	var speculativeExecResult rpc.SpeculativeExecResult
 	var speculativeDeploy casper.Deploy
 
 	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
 		speculativeExecClient = utils.GetSpeculativeClient()
-		//casperClient = utils.GetRPCClient()
+		casperClient = utils.GetRPCClient()
 		return ctx, nil
 	})
 
@@ -162,6 +163,33 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 		return err
 	})
 
+	ctx.Step(`^the speculative_exec execution_result transform with the transfer key has the "([^"]*)" field set to the purse uref of the "([^"]*)" account`,
+		func(fieldName string, accountId string) error {
+
+			transfer := speculativeExecResult.ExecutionResult.Success.Transfers[0]
+			transform, err := getTransform(speculativeExecResult, transfer.ToPrefixedString())
+			var writeTransfer *types.WriteTransfer
+
+			if err == nil {
+				writeTransfer, err = transform.Transform.ParseAsWriteTransfer()
+			}
+
+			if err == nil {
+				accountInfo, _ := getAccountInfo(casperClient, accountId)
+				var actual string
+				if fieldName == "source" {
+					actual = writeTransfer.Source.String()
+				} else {
+					actual = writeTransfer.Target.String()
+				}
+
+				expected := accountInfo.Account.MainPurse.String()
+				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer."+fieldName, strings.Split(actual, "-")[0], strings.Split(expected, "-")[0])
+				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer."+fieldName, strings.Split(actual, "-")[1], strings.Split(expected, "-")[1])
+			}
+			return err
+		})
+
 	ctx.Step(`^the speculative_exec execution_result contains a valid deploy transform$`, func() error {
 		transform, err := getTransform(speculativeExecResult, "deploy-"+speculativeDeploy.Hash.String())
 
@@ -258,4 +286,17 @@ func getAccountHash(accountId string) string {
 	} else {
 		return ""
 	}
+}
+
+func getAccountInfo(casperClient casper.RPCClient, accountId string) (rpc.StateGetAccountInfo, error) {
+	key, err := getPrivateKey(accountId)
+
+	if err == nil {
+		latest, err := casperClient.GetBlockLatest(context.Background())
+		if err == nil {
+			return casperClient.GetAccountInfoByBlochHash(context.Background(), latest.Block.Hash.String(), key.PublicKey())
+		}
+	}
+
+	return rpc.StateGetAccountInfo{}, err
 }
