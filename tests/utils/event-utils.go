@@ -11,7 +11,7 @@ import (
 
 func WaitForDeploy(deployHash string, timeoutSeconds int) (casper.InfoGetDeployResult, error) {
 
-	sdk := GetSdk()
+	sdk := GetRPCClient()
 
 	var timeout = int64(timeoutSeconds*1000) + time.Now().UnixMilli()
 	var deploy = casper.InfoGetDeployResult{}
@@ -38,7 +38,7 @@ func WaitForBlockAdded(deployHash string, timeoutSeconds int) (sse.BlockAddedEve
 
 	var blockAddedEvent sse.BlockAddedEvent
 	err := Pass
-	sseClient := GetSse()
+	sseClient := GetSseClient()
 
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Duration(timeoutSeconds)*time.Second)
 	defer cancel()

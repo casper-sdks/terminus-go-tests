@@ -26,7 +26,7 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 
 	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
-		sdk = utils.GetSdk()
+		sdk = utils.GetRPCClient()
 		return ctx, nil
 	})
 
