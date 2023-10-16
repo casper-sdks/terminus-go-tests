@@ -43,7 +43,7 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^that the latest block is requested via the sdk$`, func() error {
-		block, err := utils.GetSdk().GetBlockLatest(context.Background())
+		block, err := utils.GetRPCClient().GetBlockLatest(context.Background())
 		if err != nil {
 			return err
 		}
