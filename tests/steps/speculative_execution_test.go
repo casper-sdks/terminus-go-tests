@@ -190,7 +190,7 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 			return err
 		})
 
-	ctx.Step(`^the speculative_exec execution_result contains a valid deploy transform$`, func() error {
+	ctx.Step(`the speculative_exec execution_result transform with the deploy key has the deploy_hash of the transfer's hash$`, func() error {
 		transform, err := getTransform(speculativeExecResult, "deploy-"+speculativeDeploy.Hash.String())
 
 		if err == nil {
@@ -205,9 +205,70 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 		return nil
 	})
 
-	ctx.Step(`^the speculative_exec execution_result contains a valid AddUInt512 transform with a value of (\d+)$`, func(value int64) error {
-		return nil
+	ctx.Step(`the speculative_exec execution_result transform with a deploy key has a gas field of (\d+)$`, func(value int64) error {
+		return utils.NotImplementError
 	})
+
+	ctx.Step(`the speculative_exec execution_result transform with a deploy key has (\d+) transfer with a valid transfer hash$`, func(transfers int) error {
+		return utils.NotImplementError
+	})
+
+	ctx.Step(`the speculative_exec execution_result transform with a deploy key has as from field of the "([^"]*)" account hash$`, func(faucet string) error {
+		return utils.NotImplementError
+	})
+	ctx.Step(`the speculative_exec execution_result transform with a deploy key has as source field of the "([^"]*)" account purse uref$`, func(faucet string) error {
+		return utils.NotImplementError
+	})
+	ctx.Step(`the speculative_exec execution_result contains at least (\d+) valid balance transforms$`, func(min int) error {
+		transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
+		if err == nil {
+			err = utils.ExpectEqual(utils.CasperT, "balance transforms", len(transforms), min)
+		}
+		return err
+	})
+
+	ctx.Step(`the speculative_exec execution_result (\d+)st balance transform is an Identity transform$`, func(first int) error {
+		transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
+		if err == nil {
+			transform := transforms[first-1]
+			err = utils.ExpectEqual(utils.CasperT, "balance transform identity", string(transform.Transform), "\"Identity\"")
+		}
+		return err
+	})
+
+	ctx.Step(`the speculative_exec execution_result last balance transform is an Identity transform is as WriteCLValue of type "([^"]*)"$`, func(typeName string) error {
+		transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
+		if err == nil {
+			transform := transforms[len(transforms)-1]
+			err = utils.ExpectEqual(utils.CasperT, "IsWriteCLValue", transform.Transform.IsWriteCLValue(), true)
+			clValue, err := transform.Transform.ParseAsWriteCLValue()
+			if err == nil {
+				value, err := clValue.Value()
+				if err == nil {
+					err = utils.ExpectEqual(utils.CasperT, "clValue", value.Type.Name(), typeName)
+				}
+
+				if err == nil && value.UI512.Value().Int64() < 9999 {
+					err = fmt.Errorf("clValue value %d is less than 9999", value.UI512.Value().Int64())
+				}
+			}
+		}
+		return err
+	})
+
+	ctx.Step(`the speculative_exec execution_result contains a valid AddUInt512 transform with a value of (\d+)$`, func(val int64) error {
+
+		lastEntry := speculativeExecResult.ExecutionResult.Success.Effect.Transforms[len(speculativeExecResult.ExecutionResult.Success.Effect.Transforms)-1]
+		err := utils.ExpectEqual(utils.CasperT, "balance transform identity", string(lastEntry.Transform), "{\"AddUInt512\":\"100000000\"}")
+
+		if err == nil {
+			//addInt := lastEntry.Transform.ParseAsAddUInt512();
+			err = errors.New("not implemented .ParseAsAddUInt512()")
+		}
+
+		return err
+	})
+
 }
 
 func createDeploy() (casper.Deploy, error) {
@@ -268,6 +329,24 @@ func getTransform(speculativeExecResult rpc.SpeculativeExecResult, key string) (
 	}
 	return types.TransformKey{}, fmt.Errorf("unable transform to find with key %s", key)
 
+}
+
+func getFaucetBalanceTransforms(casperClient casper.RPCClient, transforms []types.TransformKey) ([]types.TransformKey, error) {
+	balanceTransforms := make([]types.TransformKey, 0)
+
+	info, err := getAccountInfo(casperClient, "faucet")
+
+	if err == nil {
+		key := "balance-" + strings.Split(info.Account.MainPurse.String(), "-")[1]
+
+		for _, transform := range transforms {
+			if transform.Key.String() == key {
+				balanceTransforms = append(balanceTransforms, transform)
+			}
+		}
+	}
+
+	return balanceTransforms, err
 }
 
 func getPrivateKey(accountId string) (keypair.PrivateKey, error) {

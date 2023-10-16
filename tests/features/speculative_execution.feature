@@ -4,7 +4,7 @@ Feature: speculative_execution
     Given that the "faucet" account transfers 2500000000 to user-1 account with a gas payment amount of 100000000 using the speculative_exec RPC API
     Then the speculative_exec has an api_version of "1.0.0"
     And a valid speculative_exec_result will be returned with 53 transforms
-    #And the speculative_exec has a valid block_hash
+    And the speculative_exec has a valid block_hash
     And the execution_results contains a cost of 100000000
     And the speculative_exec has a valid execution_result
     And the speculative_exec execution_result transform wth the transfer key contains the deploy_hash
