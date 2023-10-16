@@ -51,7 +51,10 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 
 			speculativeDeploy, err = createDeploy()
 			if err == nil {
-				speculativeExecResult, err = speculativeExecClient.SpeculativeExec(context.Background(), speculativeDeploy, nil)
+				speculativeExecResult, err = speculativeExecClient.SpeculativeExec(
+					context.Background(),
+					speculativeDeploy,
+					nil)
 			}
 			return err
 		})
@@ -61,7 +64,9 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 			return errors.New("missing speculativeExecResult")
 		}
 
-		return utils.ExpectEqual(utils.CasperT, "transforms", len(speculativeExecResult.ExecutionResult.Success.Effect.Transforms), transformCount)
+		return utils.ExpectEqual(utils.CasperT, "transforms",
+			len(speculativeExecResult.ExecutionResult.Success.Effect.Transforms),
+			transformCount)
 	})
 
 	ctx.Step(`^the speculative_exec has an api_version of "([^"]*)"`, func(apiVersion string) error {
@@ -83,85 +88,96 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 		transfer := speculativeExecResult.ExecutionResult.Success.Transfers[0]
 		transform, err := getTransform(speculativeExecResult, transfer.ToPrefixedString())
 		if err == nil {
-			err = utils.ExpectEqual(utils.CasperT, "key", transform.Key.Transfer.ToPrefixedString(), transfer.ToPrefixedString())
+			err = utils.ExpectEqual(utils.CasperT,
+				"key",
+				transform.Key.Transfer.ToPrefixedString(),
+				transfer.ToPrefixedString())
 		}
 
 		if err == nil {
-			err = utils.ExpectEqual(utils.CasperT, "transform.WriteTransfer", transform.Transform.IsWriteTransfer(), true)
+			err = utils.ExpectEqual(utils.CasperT,
+				"transform.WriteTransfer",
+				transform.Transform.IsWriteTransfer(),
+				true)
 		}
-
 		return err
 	})
 
-	ctx.Step(`^the speculative_exec execution_result transform wth the transfer key contains the deploy_hash$`, func() error {
+	ctx.Step(`^the speculative_exec execution_result transform wth the transfer key contains the deploy_hash$`,
+		func() error {
 
-		transfer := speculativeExecResult.ExecutionResult.Success.Transfers[0]
-		transform, err := getTransform(speculativeExecResult, transfer.ToPrefixedString())
-		var writeTransfer *types.WriteTransfer
+			transfer := speculativeExecResult.ExecutionResult.Success.Transfers[0]
+			transform, err := getTransform(speculativeExecResult, transfer.ToPrefixedString())
+			var writeTransfer *types.WriteTransfer
 
-		if err == nil {
-			writeTransfer, err = transform.Transform.ParseAsWriteTransfer()
-			err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.deploy_hash", writeTransfer.DeployHash.String(), speculativeDeploy.Hash.String())
-		}
-
-		if err == nil {
-			actual := writeTransfer.To.String()
-			userOneKey, _ := casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/user-1/secret_key.pem")
-			expected := userOneKey.PublicKey().AccountHash().String()
-			err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.To", actual, expected)
-		}
-
-		if err == nil {
-			actual := writeTransfer.From.String()
-			faucetKey, _ := casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
-			expected := faucetKey.PublicKey().AccountHash().String()
-			err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.from", actual, expected)
-		}
-
-		return err
-	})
-
-	ctx.Step(`^the speculative_exec execution_result transform with the transfer key has the amount of (\d+)`, func(amount int64) error {
-
-		transfer := speculativeExecResult.ExecutionResult.Success.Transfers[0]
-		transform, err := getTransform(speculativeExecResult, transfer.ToPrefixedString())
-		var writeTransfer *types.WriteTransfer
-
-		if err == nil {
-			writeTransfer, err = transform.Transform.ParseAsWriteTransfer()
-		}
-
-		if err == nil {
-			// FIXME Should be big.Int
-			err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.amount", writeTransfer.Amount, uint64(amount))
-		}
-
-		return err
-	})
-
-	ctx.Step(`^the speculative_exec execution_result transform with the transfer key has the "([^"]*)" field set to the "([^"]*)" account hash`, func(fieldName string, accountId string) error {
-
-		transfer := speculativeExecResult.ExecutionResult.Success.Transfers[0]
-		transform, err := getTransform(speculativeExecResult, transfer.ToPrefixedString())
-		var writeTransfer *types.WriteTransfer
-
-		if err == nil {
-			writeTransfer, err = transform.Transform.ParseAsWriteTransfer()
-		}
-
-		if err == nil {
-			var accountHash = getAccountHash(accountId)
-			var actual string
-			if fieldName == "from" {
-				actual = writeTransfer.From.String()
-			} else {
-				actual = writeTransfer.To.String()
+			if err == nil {
+				writeTransfer, err = transform.Transform.ParseAsWriteTransfer()
+				err = utils.ExpectEqual(utils.CasperT,
+					"WriteTransfer.deploy_hash",
+					writeTransfer.DeployHash.String(),
+					speculativeDeploy.Hash.String())
 			}
 
-			err = utils.ExpectEqual(utils.CasperT, "WriteTransfer."+fieldName, actual, accountHash)
-		}
-		return err
-	})
+			if err == nil {
+				actual := writeTransfer.To.String()
+				userOneKey, _ := casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/user-1/secret_key.pem")
+				expected := userOneKey.PublicKey().AccountHash().String()
+				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.To", actual, expected)
+			}
+
+			if err == nil {
+				actual := writeTransfer.From.String()
+				faucetKey, _ := casper.NewED25519PrivateKeyFromPEMFile("../../assets/net-1/faucet/secret_key.pem")
+				expected := faucetKey.PublicKey().AccountHash().String()
+				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.from", actual, expected)
+			}
+
+			return err
+		})
+
+	ctx.Step(`^the speculative_exec execution_result transform with the transfer key has the amount of (\d+)`,
+		func(amount int64) error {
+
+			transfer := speculativeExecResult.ExecutionResult.Success.Transfers[0]
+			transform, err := getTransform(speculativeExecResult, transfer.ToPrefixedString())
+			var writeTransfer *types.WriteTransfer
+
+			if err == nil {
+				writeTransfer, err = transform.Transform.ParseAsWriteTransfer()
+			}
+
+			if err == nil {
+				// FIXME Should be big.Int
+				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.amount", writeTransfer.Amount, uint64(amount))
+			}
+
+			return err
+		})
+
+	ctx.Step(`^the speculative_exec execution_result transform with the transfer key has the "([^"]*)" field set to the "([^"]*)" account hash`,
+		func(fieldName string, accountId string) error {
+
+			transfer := speculativeExecResult.ExecutionResult.Success.Transfers[0]
+			transform, err := getTransform(speculativeExecResult, transfer.ToPrefixedString())
+			var writeTransfer *types.WriteTransfer
+
+			if err == nil {
+				writeTransfer, err = transform.Transform.ParseAsWriteTransfer()
+			}
+
+			if err == nil {
+				var accountHash = getAccountHash(accountId)
+				var actual string
+				if fieldName == "from" {
+					actual = writeTransfer.From.String()
+				} else {
+					actual = writeTransfer.To.String()
+				}
+
+				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer."+fieldName, actual, accountHash)
+			}
+			return err
+		})
 
 	ctx.Step(`^the speculative_exec execution_result transform with the transfer key has the "([^"]*)" field set to the purse uref of the "([^"]*)" account`,
 		func(fieldName string, accountId string) error {
@@ -184,91 +200,107 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 				}
 
 				expected := accountInfo.Account.MainPurse.String()
-				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer."+fieldName, strings.Split(actual, "-")[0], strings.Split(expected, "-")[0])
-				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer."+fieldName, strings.Split(actual, "-")[1], strings.Split(expected, "-")[1])
+				err = utils.ExpectEqual(utils.CasperT,
+					"WriteTransfer."+fieldName,
+					strings.Split(actual, "-")[0],
+					strings.Split(expected, "-")[0])
+				err = utils.ExpectEqual(utils.CasperT,
+					"WriteTransfer."+fieldName,
+					strings.Split(actual, "-")[1],
+					strings.Split(expected, "-")[1])
 			}
 			return err
 		})
 
-	ctx.Step(`the speculative_exec execution_result transform with the deploy key has the deploy_hash of the transfer's hash$`, func() error {
-		transform, err := getTransform(speculativeExecResult, "deploy-"+speculativeDeploy.Hash.String())
+	ctx.Step(`the speculative_exec execution_result transform with the deploy key has the deploy_hash of the transfer's hash$`,
+		func() error {
+			transform, err := getTransform(speculativeExecResult, "deploy-"+speculativeDeploy.Hash.String())
 
-		if err == nil {
-			t := transform.Transform
-
-			// FIXME Fails should have a method t. isWriteDeployInfo()
-			if !t.IsWriteCLValue() {
-				return errors.New("should have a method t. isWriteDeployInfo()")
-			}
-		}
-
-		return nil
-	})
-
-	ctx.Step(`the speculative_exec execution_result transform with a deploy key has a gas field of (\d+)$`, func(value int64) error {
-		return utils.NotImplementError
-	})
-
-	ctx.Step(`the speculative_exec execution_result transform with a deploy key has (\d+) transfer with a valid transfer hash$`, func(transfers int) error {
-		return utils.NotImplementError
-	})
-
-	ctx.Step(`the speculative_exec execution_result transform with a deploy key has as from field of the "([^"]*)" account hash$`, func(faucet string) error {
-		return utils.NotImplementError
-	})
-	ctx.Step(`the speculative_exec execution_result transform with a deploy key has as source field of the "([^"]*)" account purse uref$`, func(faucet string) error {
-		return utils.NotImplementError
-	})
-	ctx.Step(`the speculative_exec execution_result contains at least (\d+) valid balance transforms$`, func(min int) error {
-		transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
-		if err == nil {
-			err = utils.ExpectEqual(utils.CasperT, "balance transforms", len(transforms), min)
-		}
-		return err
-	})
-
-	ctx.Step(`the speculative_exec execution_result (\d+)st balance transform is an Identity transform$`, func(first int) error {
-		transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
-		if err == nil {
-			transform := transforms[first-1]
-			err = utils.ExpectEqual(utils.CasperT, "balance transform identity", string(transform.Transform), "\"Identity\"")
-		}
-		return err
-	})
-
-	ctx.Step(`the speculative_exec execution_result last balance transform is an Identity transform is as WriteCLValue of type "([^"]*)"$`, func(typeName string) error {
-		transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
-		if err == nil {
-			transform := transforms[len(transforms)-1]
-			err = utils.ExpectEqual(utils.CasperT, "IsWriteCLValue", transform.Transform.IsWriteCLValue(), true)
-			clValue, err := transform.Transform.ParseAsWriteCLValue()
 			if err == nil {
-				value, err := clValue.Value()
-				if err == nil {
-					err = utils.ExpectEqual(utils.CasperT, "clValue", value.Type.Name(), typeName)
-				}
+				t := transform.Transform
 
-				if err == nil && value.UI512.Value().Int64() < 9999 {
-					err = fmt.Errorf("clValue value %d is less than 9999", value.UI512.Value().Int64())
+				// FIXME Fails should have a method t. isWriteDeployInfo()
+				if !t.IsWriteCLValue() {
+					return errors.New("should have a method t. isWriteDeployInfo()")
 				}
 			}
-		}
-		return err
-	})
 
-	ctx.Step(`the speculative_exec execution_result contains a valid AddUInt512 transform with a value of (\d+)$`, func(val int64) error {
+			return nil
+		})
 
-		lastEntry := speculativeExecResult.ExecutionResult.Success.Effect.Transforms[len(speculativeExecResult.ExecutionResult.Success.Effect.Transforms)-1]
-		err := utils.ExpectEqual(utils.CasperT, "balance transform identity", string(lastEntry.Transform), "{\"AddUInt512\":\"100000000\"}")
+	ctx.Step(`the speculative_exec execution_result transform with a deploy key has a gas field of (\d+)$`,
+		func(value int64) error {
+			return utils.NotImplementError
+		})
 
-		if err == nil {
-			//addInt := lastEntry.Transform.ParseAsAddUInt512();
-			err = errors.New("not implemented .ParseAsAddUInt512()")
-		}
+	ctx.Step(`the speculative_exec execution_result transform with a deploy key has (\d+) transfer with a valid transfer hash$`,
+		func(transfers int) error {
+			return utils.NotImplementError
+		})
 
-		return err
-	})
+	ctx.Step(`the speculative_exec execution_result transform with a deploy key has as from field of the "([^"]*)" account hash$`,
+		func(faucet string) error {
+			return utils.NotImplementError
+		})
 
+	ctx.Step(`the speculative_exec execution_result transform with a deploy key has as source field of the "([^"]*)" account purse uref$`,
+		func(faucet string) error {
+			return utils.NotImplementError
+		})
+
+	ctx.Step(`the speculative_exec execution_result contains at least (\d+) valid balance transforms$`,
+		func(min int) error {
+			transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
+			if err == nil {
+				err = utils.ExpectEqual(utils.CasperT, "balance transforms", len(transforms), min)
+			}
+			return err
+		})
+
+	ctx.Step(`the speculative_exec execution_result (\d+)st balance transform is an Identity transform$`,
+		func(first int) error {
+			transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
+			if err == nil {
+				transform := transforms[first-1]
+				err = utils.ExpectEqual(utils.CasperT, "balance transform identity", string(transform.Transform), "\"Identity\"")
+			}
+			return err
+		})
+
+	ctx.Step(`the speculative_exec execution_result last balance transform is an Identity transform is as WriteCLValue of type "([^"]*)"$`,
+		func(typeName string) error {
+			transforms, err := getFaucetBalanceTransforms(casperClient, speculativeExecResult.ExecutionResult.Success.Effect.Transforms)
+			if err == nil {
+				transform := transforms[len(transforms)-1]
+				err = utils.ExpectEqual(utils.CasperT, "IsWriteCLValue", transform.Transform.IsWriteCLValue(), true)
+				clValue, err := transform.Transform.ParseAsWriteCLValue()
+				if err == nil {
+					value, err := clValue.Value()
+					if err == nil {
+						err = utils.ExpectEqual(utils.CasperT, "clValue", value.Type.Name(), typeName)
+					}
+
+					if err == nil && value.UI512.Value().Int64() < 9999 {
+						err = fmt.Errorf("clValue value %d is less than 9999", value.UI512.Value().Int64())
+					}
+				}
+			}
+			return err
+		})
+
+	ctx.Step(`the speculative_exec execution_result contains a valid AddUInt512 transform with a value of (\d+)$`,
+		func(val int64) error {
+
+			lastEntry := speculativeExecResult.ExecutionResult.Success.Effect.Transforms[len(speculativeExecResult.ExecutionResult.Success.Effect.Transforms)-1]
+			err := utils.ExpectEqual(utils.CasperT, "balance transform identity", string(lastEntry.Transform), "{\"AddUInt512\":\"100000000\"}")
+
+			if err == nil {
+				//addInt := lastEntry.Transform.ParseAsAddUInt512();
+				err = errors.New("not implemented .ParseAsAddUInt512()")
+			}
+
+			return err
+		})
 }
 
 func createDeploy() (casper.Deploy, error) {
@@ -345,7 +377,6 @@ func getFaucetBalanceTransforms(casperClient casper.RPCClient, transforms []type
 			}
 		}
 	}
-
 	return balanceTransforms, err
 }
 
@@ -359,7 +390,6 @@ func getPrivateKey(accountId string) (keypair.PrivateKey, error) {
 
 func getAccountHash(accountId string) string {
 	key, err := getPrivateKey(accountId)
-
 	if err == nil {
 		return key.PublicKey().AccountHash().String()
 	} else {
