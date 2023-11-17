@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
-	cltype "github.com/make-software/casper-go-sdk/types/clvalue/cltype"
+	"github.com/make-software/casper-go-sdk/types/clvalue/cltype"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -21,7 +21,6 @@ func InitializeNestedMaps(ctx *godog.ScenarioContext) {
 
 	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
-		//sdk = utils.GetRPCClient()
 		return ctx, nil
 	})
 
