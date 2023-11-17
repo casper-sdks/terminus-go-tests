@@ -3,6 +3,9 @@ package steps
 import (
 	"context"
 	"encoding/hex"
+	"github.com/make-software/casper-go-sdk/casper"
+	"github.com/make-software/casper-go-sdk/rpc"
+	"github.com/make-software/casper-go-sdk/types"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
 	"github.com/make-software/casper-go-sdk/types/clvalue/cltype"
 	"testing"
@@ -18,6 +21,10 @@ func TestFeaturesNestedMaps(t *testing.T) {
 
 func InitializeNestedMaps(ctx *godog.ScenarioContext) {
 	var clMap clvalue.CLValue
+	var deploy *types.Deploy
+	var sdk casper.RPCClient
+	var result rpc.PutDeployResult
+	var deployResult casper.InfoGetDeployResult
 
 	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
@@ -93,15 +100,30 @@ func InitializeNestedMaps(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`that the nested map is deployed in a transfer$`, func() error {
-		return utils.NotImplementError
+		var err error
+
+		namedArgs := &types.Args{}
+		namedArgs.AddArgument("map", clMap)
+		deploy, err = utils.BuildStandardTransferDeploy(*namedArgs)
+
+		// Fails here raised issue https://github.com/make-software/casper-go-sdk/issues/70
+		result, err = sdk.PutDeploy(context.Background(), *deploy)
+
+		return err
 	})
 
 	ctx.Step(`the transfer containing the nested map is successfully executed$`, func() error {
-		return utils.NotImplementError
+		var err error
+		deployResult, err = utils.WaitForDeploy(result.DeployHash.String(), 300)
+		return err
 	})
 
 	ctx.Step(`the map is read from the deploy$`, func() error {
-		return utils.NotImplementError
+		mapVal, err := deployResult.Deploy.Session.Transfer.Args.Find("map")
+		if err == nil {
+			clMap, err = mapVal.Value()
+		}
+		return err
 	})
 
 	ctx.Step(`the map's key is "([^"]*)" and value is "([^"]*)"$`, func(key string, strValue string) error {
