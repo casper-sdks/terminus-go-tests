@@ -17,6 +17,11 @@ func CreateValue(typeName string, strValue string) (*clvalue.CLValue, error) {
 
 	switch typeName {
 
+	case "Any":
+		var bytes []byte
+		bytes, err = hex.DecodeString(strValue)
+		clVal = clvalue.NewCLAny(bytes)
+
 	case "Bool":
 		var b bool
 		b, err = strconv.ParseBool(strValue)
@@ -114,6 +119,7 @@ func CreateComplexValue(typeName string, innerTypes []string, strValues []string
 	}
 
 	switch typeName {
+
 	case "Option":
 		clVal = clvalue.NewCLOption(innerValues[0])
 
