@@ -60,6 +60,7 @@ func InitializeNestedTuples(ctx *godog.ScenarioContext) {
 
 		},
 	)
+
 	ctx.Step(`that a nested Tuple(\d+) is defined as \((\d+), (\d+), \((\d+), (\d+), \((\d+), (\d+), (\d+)\)\)\) using U32 numeric values$`,
 		func(index int, value1 int, value2 int, value3 int, value4 int, value5 int, value6 int, value7 int) error {
 
@@ -132,7 +133,6 @@ func InitializeNestedTuples(ctx *godog.ScenarioContext) {
 
 		return err
 	})
-
 }
 
 func getExpectedTupleValues(value string) []uint32 {
@@ -168,6 +168,7 @@ func populateTupleValues(value clvalue.CLValue, values []uint32) []uint32 {
 	}
 	return values
 }
+
 func getTupleBytes(index int) []byte {
 	if index == 1 {
 		return tuple1.Bytes()
@@ -175,8 +176,9 @@ func getTupleBytes(index int) []byte {
 		return tuple2.Bytes()
 	} else if index == 3 {
 		return tuple3.Bytes()
+	} else {
+		return nil
 	}
-	return nil
 }
 
 func getTupleArgument(args types.Args, name string) (clvalue.CLValue, error) {
