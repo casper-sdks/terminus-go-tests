@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-// The test features implementation for the nested_tuples.feature
+// The test features implementation for the option_values.feature
 func TestFeaturesOptionValues(t *testing.T) {
 	utils.TestFeatures(t, "option_values.feature", InitializeOptionValues)
 }
@@ -31,36 +31,31 @@ func InitializeOptionValues(ctx *godog.ScenarioContext) {
 		return ctx, nil
 	})
 
-	ctx.Step(`that an Option value has an empty value$`,
-		func() error {
+	ctx.Step(`that an Option value has an empty value$`, func() error {
 
-			var bytes = []byte{0}
+		var bytes = []byte{0}
 
-			fromBytes, err := clvalue.NewOptionFromBytes(bytes, cltype.NewOptionType(cltype.Bool))
+		fromBytes, err := clvalue.NewOptionFromBytes(bytes, cltype.NewOptionType(cltype.Bool))
 
-			optionValue = clvalue.CLValue{
-				Option: fromBytes,
-			}
+		optionValue = clvalue.CLValue{
+			Option: fromBytes,
+		}
 
-			return err
-		},
-	)
+		return err
+	})
 
-	ctx.Step(`the Option value is not present$`,
-		func() error {
-			return utils.ExpectEqual(utils.CasperT, "empty", optionValue.Option.IsEmpty(), true)
-		},
-	)
+	ctx.Step(`the Option value is not present$`, func() error {
+		return utils.ExpectEqual(utils.CasperT, "empty", optionValue.Option.IsEmpty(), true)
+	})
 
-	ctx.Step(`^the Option value's bytes are "([^"]*)"$`,
-		func(strHex string) error {
-			var actualHex = ""
-			if !optionValue.Option.IsEmpty() {
-				actualHex = hex.EncodeToString(optionValue.Bytes())
-			}
-			return utils.ExpectEqual(utils.CasperT, "bytes", actualHex, strHex) // err
-		},
-	)
+	ctx.Step(`^the Option value's bytes are "([^"]*)"$`, func(strHex string) error {
+		var actualHex = ""
+		if !optionValue.Option.IsEmpty() {
+			actualHex = hex.EncodeToString(optionValue.Bytes())
+		}
+		return utils.ExpectEqual(utils.CasperT, "bytes", actualHex, strHex) // err
+	})
+
 	ctx.Step(`^an Option value contains a "([^"]*)" value of "([^"]*)"$`,
 		func(typeName string, strValue string) error {
 			innerValue, err := utils.CreateValue(typeName, strValue)
