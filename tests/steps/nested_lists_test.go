@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/cucumber/godog"
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
@@ -99,19 +100,37 @@ func InitializedNestedLists(ctx *godog.ScenarioContext) {
 
 	ctx.Step(`the list's "([^"]*)" item is a CLValue with "([^"]*)" value of "([^"]*)"$`,
 		func(nth string, valueType string, strValue string) error {
-			return errors.New("no methods exposed to obtain list elements")
+			clVal := getListElement(clList, nth)
+
+			err := utils.ExpectEqual(utils.CasperT, "type", clVal.Type.Name(), valueType)
+
+			if err == nil {
+				err = utils.ExpectEqual(utils.CasperT, "value", clVal.String(), strValue)
+			}
+			return err
 		},
 	)
 
 	ctx.Step(`the list's "([^"]*)" item is a CLValue with U(\d+) value of (\d+)$`,
-		func(nth string, numLen int, value string) error {
-			return errors.New("no methods exposed to obtain list elements")
+		func(nth string, numLen int, value int) error {
+
+			clVal := getListElement(clList, nth)
+			err := utils.ExpectEqual(utils.CasperT, "type", clVal.Type.Name(), fmt.Sprintf("U%d", numLen))
+			if err == nil {
+				err = utils.ExpectEqual(utils.CasperT, "value", clVal.String(), fmt.Sprintf("%d", value))
+			}
+			return err
 		},
 	)
 
 	ctx.Step(`the list's "([^"]*)" item is a CLValue with I(\d+) value of (\d+)$`,
-		func(nth string, numLen int, value string) error {
-			return errors.New("no methods exposed to obtain list elements")
+		func(nth string, numLen int, value int) error {
+			clVal := getListElement(clList, nth)
+			err := utils.ExpectEqual(utils.CasperT, "type", clVal.Type.Name(), fmt.Sprintf("I%d", numLen))
+			if err == nil {
+				err = utils.ExpectEqual(utils.CasperT, "value", clVal.String(), fmt.Sprintf("%d", value))
+			}
+			return err
 		},
 	)
 
@@ -147,6 +166,11 @@ func InitializedNestedLists(ctx *godog.ScenarioContext) {
 		}
 		return err
 	})
+}
+
+func getListElement(list clvalue.CLValue, nth string) clvalue.CLValue {
+	index := int(nth[0]) - int('1')
+	return list.List.Elements[index]
 }
 
 func createValue(typeName string, strValue string) clvalue.CLValue {
