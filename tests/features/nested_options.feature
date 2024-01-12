@@ -27,32 +27,32 @@ Feature: Nested Options
     And the bytes are "0103000000010101020103"
 
   Scenario: Nested Tuple
-    Given that a nested Option has an inner type of Tuple2 with a type of "String,U32" values of "7fc5ae1d-348e-4b01-97cf-a1c2942b28a9,10000"
-    Then the inner type is Tuple2 with a type of "String,U32" and a value of "7fc5ae1d-348e-4b01-97cf-a1c2942b28a9, 10000"
+    Given that a nested Option has an inner type of Tuple2 with a type of "String,U32" values of ("7fc5ae1d-348e-4b01-97cf-a1c2942b28a9", 10000)
+    Then the inner type is Tuple2 with a type of "String,U32" and a value of ("7fc5ae1d-348e-4b01-97cf-a1c2942b28a9", 10000)
     And the bytes are "012400000037666335616531642d333438652d346230312d393763662d61316332393432623238613910270000"
     Given that the nested Option is deployed in a transfer
     And the transfer containing the nested Option is successfully executed
     When the Option is read from the deploy
-    Then the inner type is Tuple2 with a type of "String,U32" and a value of "7fc5ae1d-348e-4b01-97cf-a1c2942b28a9, 10000"
+    Then the inner type is Tuple2 with a type of "String,U32" and a value of ("7fc5ae1d-348e-4b01-97cf-a1c2942b28a9", 10000)
     And the bytes are "012400000037666335616531642d333438652d346230312d393763662d61316332393432623238613910270000"
 
   Scenario: Nested Map
-    Given that a nested Option has an inner type of Map with a type of "String,U32" values of {"ONE": 2}
-    Then the inner type is Map with a type of "String,U32" and a value of "{"ONE": 2}"
+    Given that a nested Option has an inner type of Map with a type of "String,U32" value of {"ONE": 2}
+    Then the inner type is Map with a type of "String,U32" and a value of {"ONE": 2}
     And the bytes are "0101000000030000004f4e4502000000"
     Given that the nested Option is deployed in a transfer
     And the transfer containing the nested Option is successfully executed
     When the Option is read from the deploy
-    Then the inner type is Map with a type of "String,U32" and a value of "{"ONE": 2}"
+    Then the inner type is Map with a type of "String,U32" and a value of {"ONE": 2}
     And the bytes are "0101000000030000004f4e4502000000"
 
   Scenario: Nested Any
-    Given that a nested Option has an inner type of Any with a value of "fdaddd54-a11e-45f2-bbba-e200118567f3"
-    Then the inner type is Any with a value of "fdaddd54-a11e-45f2-bbba-e200118567f3"
+    Given that a nested Option has an inner type of Any with a value of "fdaddd54a11e45f2bbbae200118567f3"
+    Then the inner type is Any with a value of "fdaddd54a11e45f2bbbae200118567f3"
     And the bytes are "0101000000030000004f4e4502000000"
     Given that the nested Option is deployed in a transfer
-    And the transfer containing the nested Option is successfully executed
+    And the transfer containing the nested Option is successfully execute
     When the Option is read from the deploy
-    Then the inner type is Any with a value of "fdaddd54-a11e-45f2-bbba-e200118567f3"
+    Then the inner type is Any with a value of "fdaddd54a11e45f2bbbae200118567f3"
     And the bytes are "0101000000030000004f4e4502000000"
 
