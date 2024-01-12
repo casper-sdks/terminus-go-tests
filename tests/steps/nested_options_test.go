@@ -20,7 +20,7 @@ import (
 	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
-// The test features implementation for the nested_maps.feature
+// The test features implementation for the nested_options.feature
 func TestFeaturesNestedOptions(t *testing.T) {
 	utils.TestFeatures(t, "nested_options.feature", InitializeNestedOptions)
 }
@@ -149,14 +149,12 @@ func InitializeNestedOptions(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the inner type is Any with a value of "([^"]*)"$`, func(value string) error {
-
 		decoded, err := hex.DecodeString(value)
 		var actual []byte
 		if err != nil {
 			actual = clOption.Option.Value().Any.Bytes()
 		}
 		return utils.ExpectEqual(utils.CasperT, "value", actual, decoded)
-
 	})
 }
 
