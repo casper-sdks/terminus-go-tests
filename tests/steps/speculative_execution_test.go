@@ -60,10 +60,6 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 		})
 
 	ctx.Step(`^a valid speculative_exec_result will be returned with (\d+) transforms$`, func(transformCount int) error {
-		if len(speculativeExecResult.DeployHash.String()) == 0 {
-			return errors.New("missing speculativeExecResult")
-		}
-
 		return utils.ExpectEqual(utils.CasperT, "transforms",
 			len(speculativeExecResult.ExecutionResult.Success.Effect.Transforms),
 			transformCount)

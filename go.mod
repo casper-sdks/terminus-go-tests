@@ -1,16 +1,17 @@
 module github.com/stormeye2000/cspr-sdk-standard-tests-go
 
-go 1.20
+go 1.21.6
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/cucumber/godog v0.12.6
-	github.com/make-software/casper-go-sdk v1.3.0
+	github.com/make-software/casper-go-sdk v1.4.5-0.20240126123809-b1f5443e71d2
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/antchfx/xpath v1.2.3 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 )
 
@@ -23,7 +24,6 @@ require (
 )
 
 require (
-	github.com/btcsuite/btcd v0.22.3 // indirect
 	github.com/cucumber/gherkin-go/v19 v19.0.3 // indirect
 	github.com/cucumber/messages-go/v16 v16.0.1 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
@@ -33,6 +33,6 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/crypto v0.9.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 )
