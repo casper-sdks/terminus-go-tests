@@ -162,7 +162,7 @@ func InitializeQueryGlobalState(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`an error message of "([^"]*)" is returned$`, func(errorMessage string) error {
-		if expectedErr.Data != errorMessage && expectedErr.Message != "No such block" {
+		if expectedErr.Message != "No such block" {
 			return fmt.Errorf("invalid error message %s", expectedErr.Data)
 		}
 		return utils.Pass

@@ -8,6 +8,7 @@ import (
 	"github.com/make-software/casper-go-sdk/types/keypair"
 	"math/big"
 	"math/rand"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -60,10 +61,6 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 		})
 
 	ctx.Step(`^a valid speculative_exec_result will be returned with (\d+) transforms$`, func(transformCount int) error {
-		if len(speculativeExecResult.DeployHash.String()) == 0 {
-			return errors.New("missing speculativeExecResult")
-		}
-
 		return utils.ExpectEqual(utils.CasperT, "transforms",
 			len(speculativeExecResult.ExecutionResult.Success.Effect.Transforms),
 			transformCount)
@@ -74,9 +71,7 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^the speculative_exec has a valid block_hash$`, func() error {
-		// FIXME BlockHash is missing from the RPC SpeculativeExecResult
-		//return utils.ExpectEqual(utils.CasperT, "block_hash", len(speculativeExecResult.BlockHash.Bytes()), 32)
-		return utils.NotImplementError
+		return utils.ExpectEqual(utils.CasperT, "block_hash", len(speculativeExecResult.BlockHash.Bytes()), 32)
 	})
 
 	ctx.Step(`^the execution_results contains a cost of (\d+)$`, func(cost int) error {
@@ -147,8 +142,7 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 			}
 
 			if err == nil {
-				// FIXME Should be big.Int
-				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.amount", writeTransfer.Amount, uint64(amount))
+				err = utils.ExpectEqual(utils.CasperT, "WriteTransfer.amount", writeTransfer.Amount.String(), strconv.FormatInt(amount, 10))
 			}
 
 			return err
@@ -217,6 +211,7 @@ func InitializeSpeculativeExecution(ctx *godog.ScenarioContext) {
 			transform, err := getTransform(speculativeExecResult, "deploy-"+speculativeDeploy.Hash.String())
 
 			if err == nil {
+
 				t := transform.Transform
 
 				// FIXME Fails should have a method t. isWriteDeployInfo()
