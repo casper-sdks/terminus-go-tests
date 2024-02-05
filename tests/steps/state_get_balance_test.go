@@ -10,7 +10,7 @@ import (
 	"github.com/make-software/casper-go-sdk/rpc"
 	"github.com/make-software/casper-go-sdk/types/keypair"
 
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
+	"github.com/casper-sdks/terminus-go-tests/tests/utils"
 )
 
 // The test features implementation for the state_get_balance.feature

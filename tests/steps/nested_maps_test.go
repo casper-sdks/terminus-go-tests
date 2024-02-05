@@ -10,8 +10,8 @@ import (
 	"github.com/make-software/casper-go-sdk/types/clvalue/cltype"
 	"testing"
 
+	"github.com/casper-sdks/terminus-go-tests/tests/utils"
 	"github.com/cucumber/godog"
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
 )
 
 // The test features implementation for the nested_maps.feature
