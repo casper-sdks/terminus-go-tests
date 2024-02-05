@@ -16,7 +16,7 @@ import (
 	"github.com/make-software/casper-go-sdk/types"
 	"github.com/make-software/casper-go-sdk/types/clvalue"
 
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
+	"github.com/casper-sdks/terminus-go-tests/tests/utils"
 )
 
 // The test features implementation for the read_deploy.feature

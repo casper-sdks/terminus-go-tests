@@ -1,11 +1,11 @@
-module github.com/stormeye2000/cspr-sdk-standard-tests-go
+module github.com/casper-sdks/terminus-go-tests
 
 go 1.21.6
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/cucumber/godog v0.12.6
-	github.com/make-software/casper-go-sdk v1.4.5-0.20240126123809-b1f5443e71d2
+	github.com/make-software/casper-go-sdk v1.5.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -19,7 +19,7 @@ require (
 	github.com/antchfx/jsonquery v1.3.3
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/sync v0.2.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

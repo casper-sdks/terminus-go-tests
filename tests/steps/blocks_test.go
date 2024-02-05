@@ -9,7 +9,7 @@ import (
 	"github.com/make-software/casper-go-sdk/rpc"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
+	"github.com/casper-sdks/terminus-go-tests/tests/utils"
 )
 
 type _map struct {

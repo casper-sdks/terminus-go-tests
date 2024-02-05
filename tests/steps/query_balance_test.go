@@ -10,7 +10,7 @@ import (
 	"github.com/make-software/casper-go-sdk/casper"
 	"github.com/make-software/casper-go-sdk/rpc"
 
-	"github.com/stormeye2000/cspr-sdk-standard-tests-go/tests/utils"
+	"github.com/casper-sdks/terminus-go-tests/tests/utils"
 )
 
 // Step Definitions for the query_balance.feature
