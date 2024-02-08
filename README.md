@@ -1,21 +1,42 @@
-## CSPR SDK Standard Tests: Go
+## Terminus Go
 
 This repo holds a set of tests to be run against the Casper Go SDK.
 
 Points to note are:
 
-- The tests are run via a GitHub action, standard-tests.yml
-- The action is well documented with the steps clearly labelled
-- A dockerised image of NCTL with it's generated assets is used to run the tests against
-- Tests will run automatically on a push to main within the SDK repo
-- Tests can be run manually within this repos action tab
+- The tests can be run manually via the Terminus project [here](https://github.com/casper-sdks/terminus) 
 - The tests are built using Cucumber features
 
 
-### To run the tests
+### How to run locally
 
-- install Go as per the instructions [here](https://go.dev/doc/install)
-- clone the github project
-- checkout the required branch
-- from root of the project, run 
-  - go test -v  tests/steps/*
+- Install Go as per the instructions [here](https://go.dev/doc/install)
+
+- Clone repo and start NCTL (please note the NCTL Casper node version in the script 'docker-run')
+
+  ```bash
+  git clone git@github.com:casper-sdks/terminus-go-tests.git
+  cd terminus-js-tests/script
+  chmod +x docker-run && ./docker-run
+  chmod +x docker-copy-assets && /docker-copy-assets 
+  cd ..
+  ```
+
+- Go get the required SDK branch and run the tests
+
+  ```bash
+  go get github.com/make-software/casper-go-sdk@$[required-branch]
+  go install gotest.tools/gotestsum@latest
+  mkdir reports
+  gotestsum --format standard-verbose --junitfile reports/report.xml
+  ```
+
+- TODO script the above
+
+- JUnit test results will be output to /reports
+
+### How to run locally IDE
+
+Alternatively the tests can be run using an IDE
+
+They are developed using JetBrains GoLand
