@@ -30,7 +30,7 @@ func InitializeBlocksScenario(ctx *godog.ScenarioContext) {
 	})
 
 	ctx.Step(`^request the latest block via the test node$`, func() error {
-		block, err := utils.GetNctlLatestBlock()
+		block, err := utils.GetLatestBlock()
 		if err != nil {
 			return err
 		}

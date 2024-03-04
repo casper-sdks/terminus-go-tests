@@ -5,7 +5,6 @@ go 1.21.6
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/cucumber/godog v0.12.6
-	github.com/make-software/casper-go-sdk v1.5.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -13,6 +12,7 @@ require (
 	github.com/antchfx/xpath v1.2.3 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/make-software/casper-go-sdk v1.5.2-0.20240228154659-7f7e95235434 // indirect
 )
 
 require (

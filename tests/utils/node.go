@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/make-software/casper-go-sdk/rpc"
 	"io"
 	"log"
 	"math/big"
@@ -18,10 +19,11 @@ import (
 )
 
 // Steps for the state_get_auction_info.feature
-func GetNctlLatestBlock() (casper.Block, error) {
+
+func GetLatestBlock() (casper.Block, error) {
 	block := casper.Block{}
 
-	res, err := nctlExec("view_chain_block.sh", "")
+	res, err := nodeExec("cctl-chain-view-block", "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +38,7 @@ func GetNctlLatestBlock() (casper.Block, error) {
 }
 
 func GetNodeStatus(nodeId int) (casper.InfoGetStatusResult, error) {
-	res, err := nctlExec("view_node_status.sh", fmt.Sprintf("node=%d", nodeId))
+	res, err := nodeExec("cctl-infra-node-view-status", fmt.Sprintf("node=%d", nodeId))
 
 	index := strings.Index(res, "{")
 	jsonStr := res[index:]
@@ -51,8 +53,9 @@ func GetNodeStatus(nodeId int) (casper.InfoGetStatusResult, error) {
 }
 
 func GetStateRootHash(nodeId int) (string, error) {
-	result, err := nctlExec("view_chain_state_root_hash.sh", fmt.Sprintf("node=%d", nodeId))
-	srh := strings.Split(result, "=")[1]
+	result, err := nodeExec("cctl-chain-view-state-root-hash", fmt.Sprintf("node=%d", nodeId))
+	srh := strings.Split(result, "\r\n")[1]
+	srh = strings.Split(srh, "=")[1]
 	srh = strings.TrimSpace(srh)
 	return srh, err
 }
@@ -101,10 +104,21 @@ func GetStateAccountInfo(publicKey string, blockHash string) (string, error) {
 	return simpleRcp("state_get_account_info", params)
 }
 
-func GetEraSummary(blockHash string) (string, error) {
-	params := fmt.Sprintf("[{\"Hash\":\"%s\"}]", blockHash)
+func GetEraSummary(blockHash string) (rpc.ChainGetEraSummaryResult, error) {
+	eraSummary := rpc.ChainGetEraSummaryResult{}
+	res, err := nodeExec("cctl-chain-view-era-summary", fmt.Sprintf("[{\"Hash\":\"%s\"}]", blockHash))
 
-	return simpleRcp("chain_get_era_summary", params)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = json.Unmarshal([]byte(res), &eraSummary)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return eraSummary, err
+
 }
 
 func GetAuctionInfoByHash(hash string) (string, error) {
@@ -118,7 +132,7 @@ func QueryBalance(purseIdentifierName string, identifier string) (string, error)
 }
 
 func simpleRcp(method string, params string) (string, error) {
-	var nctlJson string
+	var nodeJson string
 	id := time.Now().UnixMilli()
 	payload := fmt.Sprintf(`{"id": %d, "jsonrpc":"2.0","method":"%s","params":%s}`, id, method, params)
 	bufferString := bytes.NewBufferString(payload)
@@ -146,15 +160,15 @@ func simpleRcp(method string, params string) (string, error) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			nctlJson = string(bodyBytes)
+			nodeJson = string(bodyBytes)
 		}
 	}
-	return nctlJson, err
+	return nodeJson, err
 }
 
-func nctlExec(command string, params string) (string, error) {
+func nodeExec(command string, params string) (string, error) {
 	docker := fmt.Sprintf("%v", config["docker-name"])
-	cmd := fmt.Sprintf("docker exec  -t %s /bin/bash -c 'source casper-node/utils/nctl/sh/views/%s %s'", docker, command, params)
+	cmd := fmt.Sprintf("docker exec  -t %s /bin/bash -c -i '%s %s'", docker, command, params)
 
 	strRes := ""
 

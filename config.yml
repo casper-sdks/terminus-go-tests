@@ -1,6 +1,7 @@
 host-name: localhost
-docker-name: cspr-nctl
+docker-name: cspr-cctl
 port-rcp: 11101
 port-rest: 14101
 port-sse: 18101
 port-spd: 25101
+chain-name: cspr-dev-cctl
