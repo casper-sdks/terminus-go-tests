@@ -64,7 +64,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 		}
 
 		header := types.DefaultHeader()
-		header.ChainName = "casper-net-1"
+		header.ChainName = utils.GetChainName()
 		header.Account = faucetKey.PublicKey()
 		header.Timestamp = types.Timestamp(time.Now())
 
@@ -186,7 +186,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 				var deploy *types.Deploy
 
 				header := types.DefaultHeader()
-				header.ChainName = "casper-net-1"
+				header.ChainName = utils.GetChainName()
 				header.Account = faucetKey.PublicKey()
 				header.Timestamp = types.Timestamp(time.Now())
 
@@ -240,7 +240,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 				var deploy *types.Deploy
 
 				header := types.DefaultHeader()
-				header.ChainName = "casper-net-1"
+				header.ChainName = utils.GetChainName()
 				header.Account = faucetKey.PublicKey()
 				header.Timestamp = types.Timestamp(time.Now())
 
@@ -291,7 +291,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 				}
 
 				header := types.DefaultHeader()
-				header.ChainName = "casper-net-1"
+				header.ChainName = utils.GetChainName()
 				header.Account = faucetKey.PublicKey()
 				header.Timestamp = types.Timestamp(time.Now())
 
@@ -337,7 +337,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 				var version json.Number = "1"
 
 				header := types.DefaultHeader()
-				header.ChainName = "casper-net-1"
+				header.ChainName = utils.GetChainName()
 				header.Account = faucetKey.PublicKey()
 				header.Timestamp = types.Timestamp(time.Now())
 

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/cucumber/godog"
 	"log"
 	"os"
@@ -33,4 +34,8 @@ func TestFeatures(t *testing.T, featureName string, scenarioInitializer func(*go
 	if suite.Run() != 0 {
 		t.Fatal("non-zero status returned, failed to run feature tests")
 	}
+}
+
+func GetChainName() string {
+	return fmt.Sprintf("%v", config["chain-name"])
 }

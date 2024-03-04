@@ -97,7 +97,7 @@ func BuildStandardTransferDeploy(namedArgs types.Args) (*types.Deploy, error) {
 	}
 
 	header := types.DefaultHeader()
-	header.ChainName = "casper-net-1"
+	header.ChainName = GetChainName()
 	header.Account = senderKey.PublicKey()
 	header.Timestamp = types.Timestamp(time.Now())
 	payment := types.StandardPayment(big.NewInt(100000000))

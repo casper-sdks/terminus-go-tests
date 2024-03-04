@@ -211,7 +211,7 @@ func createTransfer(sdk casper.RPCClient) (rpc.PutDeployResult, error) {
 	}
 
 	header := types.DefaultHeader()
-	header.ChainName = "casper-net-1"
+	header.ChainName = utils.GetChainName()
 	header.Account = senderKey.PublicKey()
 	header.Timestamp = types.Timestamp(time.Now())
 	stdPayment := types.StandardPayment(big.NewInt(100000000))

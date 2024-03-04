@@ -312,7 +312,7 @@ func createDeploy() (casper.Deploy, error) {
 	}
 
 	header := types.DefaultHeader()
-	header.ChainName = "casper-net-1"
+	header.ChainName = utils.GetChainName()
 	header.Account = faucetKey.PublicKey()
 	header.Timestamp = types.Timestamp(time.Now())
 	payment := types.StandardPayment(big.NewInt(100000000))

@@ -100,7 +100,7 @@ func InitializeDeploys(ctx *godog.ScenarioContext) {
 		assert.NotNil(utils.CasperT, chainName, "chainName")
 
 		header := types.DefaultHeader()
-		header.ChainName = chainName
+		header.ChainName = utils.GetChainName()
 		header.Account = senderKey.PublicKey()
 		header.Timestamp = types.Timestamp(time.Now())
 		payment := types.StandardPayment(big.NewInt(100000000))
