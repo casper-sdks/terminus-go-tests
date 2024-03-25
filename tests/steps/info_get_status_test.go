@@ -54,9 +54,9 @@ func InitializeInfoGetStatus(ctx *godog.ScenarioContext) {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the info_get_status_result chainspec_name is "([^"]*)"$`, func(chainSpecName string) error {
-		if chainSpecName != infoGetStatusResult.ChainSpecName {
-			return fmt.Errorf("expected %s ChainSpecName to be %s", infoGetStatusResult.ChainSpecName, chainSpecName)
+	ctx.Step(`^the info_get_status_result chainspec_name is "([^"]*)"$`, func(_ string) error {
+		if utils.GetConfigChainName() != infoGetStatusResult.ChainSpecName {
+			return fmt.Errorf("expected %s ChainSpecName to be %s", infoGetStatusResult.ChainSpecName, utils.GetConfigChainName())
 		}
 
 		return utils.Pass
