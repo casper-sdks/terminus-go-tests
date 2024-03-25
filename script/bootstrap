@@ -21,7 +21,7 @@ then
   rm ../tests/json
 fi
 
-echo "Creating features symbolic link required for IntelliJ debugging of features"
+echo "Creating features symbolic link required for execution and debugging of features"
 ln -s "$(realpath "../terminus-test-resources/features")" ../tests/features
 ln -s "$(realpath "../terminus-test-resources/contracts")" ../tests/contracts
 ln -s "$(realpath "../terminus-test-resources/json")" ../tests/json
