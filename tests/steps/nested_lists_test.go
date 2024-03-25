@@ -17,7 +17,7 @@ import (
 
 // The test features implementation for the nested_lists.feature
 func TestFeaturesNestedLists(t *testing.T) {
-	utils.TestFeatures(t, "nested_lists.feature", InitializedNestedLists)
+	utils.TestFeatures(t, "nested_list.feature", InitializedNestedLists)
 }
 
 func InitializedNestedLists(ctx *godog.ScenarioContext) {
