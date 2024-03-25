@@ -151,3 +151,7 @@ func BuildStandardTransferDeploy(namedArgs types.Args) (*types.Deploy, error) {
 
 	return deploy, err
 }
+
+func GetConfigChainName() string {
+	return config["chain-name"].(string)
+}

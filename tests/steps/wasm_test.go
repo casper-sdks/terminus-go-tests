@@ -173,7 +173,7 @@ func InitializeWasmFeature(ctx *godog.ScenarioContext) {
 		},
 	)
 
-	ctx.Step(`^the contract entry point is invoked with a transfer amount of "([^"]*)"$`,
+	ctx.Step(`^the contract entry point is invoked by hash with a transfer amount of "([^"]*)"$`,
 		func(transferAmount string) error {
 			recipient, err := keypair.GeneratePrivateKey(keypair.ED25519)
 			if err != nil {

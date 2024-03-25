@@ -33,7 +33,7 @@ func InitializeClAnyValue(ctx *godog.ScenarioContext) {
 		return ctx, nil
 	})
 
-	ctx.Step(`^an Any value contains a "([^"]*)" value of "([^"]*)"$`, func(typeName string, hexBytes string) error {
+	ctx.Step(`^an Any value contains a byte array value of "([^"]*)"$`, func(hexBytes string) error {
 		decoded, err := hex.DecodeString(hexBytes)
 		if err == nil {
 			value = clvalue.NewCLAny(decoded)

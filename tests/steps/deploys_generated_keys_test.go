@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/big"
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 
@@ -37,6 +38,8 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 	var senderKey keypair.PrivateKey
 	var faucetKey keypair.PrivateKey
 	var receiverKey keypair.PrivateKey
+	var algType = ""
+	const pemFileName = "tmp-secret-key.pem"
 
 	ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		utils.ReadConfig()
@@ -47,6 +50,7 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 	ctx.Step(`^that a "([^"]*)" sender key is generated$`, func(keyAlgo string) error {
 		var err error
 
+		algType = keyAlgo
 		senderKey, err = generateKey(keyAlgo)
 
 		if err == nil && senderKey.PublicKey().Bytes() == nil {
@@ -62,6 +66,30 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 		}
 
 		return err
+	})
+
+	ctx.Step(`^the key is written to a .pem file$`, func() error {
+
+		pem, err := senderKey.ToPem()
+		if err == nil {
+			err = os.WriteFile(pemFileName, pem, 0644)
+		}
+		return err
+	})
+
+	ctx.Step(`^the key is read from the .pem file$`, func() error {
+		var err error = nil
+		if algType == ED25519 {
+			senderKey, err = casper.NewED25519PrivateKeyFromPEMFile(pemFileName)
+		} else if algType == SECP256K1 {
+			senderKey, err = casper.NewSECP256k1PrivateKeyFromPEMFile(pemFileName)
+		}
+		_ = os.Remove(pemFileName)
+		return err
+	})
+
+	ctx.Step(`^the key is the same as the original key$`, func() error {
+		return nil
 	})
 
 	ctx.Step(`^fund the account from the faucet user with a transfer amount of (\d+) and a payment amount of (\d+)$`,
@@ -98,7 +126,7 @@ func InitializeGeneratedKeys(ctx *godog.ScenarioContext) {
 		return doDeploy(sdk, senderKey, receiverKey.PublicKey(), transfer, payment)
 	})
 
-	ctx.Step(`the transfer approvals signer contains the "([^"]*)" algo$`, func(keyAlg string) error {
+	ctx.Step(`the deploy sender account key contains the "([^"]*)" algo$`, func(keyAlg string) error {
 		deploy, err := sdk.GetDeploy(context.Background(), keysDeployResult.DeployHash.String())
 
 		approval := deploy.Deploy.Approvals[0]

@@ -78,7 +78,7 @@ func InitializeNestedOptions(ctx *godog.ScenarioContext) {
 		return err
 	})
 
-	ctx.Step(`^the Option is read from the deploy$`, func() error {
+	ctx.Step(`^the nested Option is read from the deploy$`, func() error {
 		optionArg, err := deployResult.Deploy.Session.Transfer.Args.Find("option")
 		if err == nil {
 			clOption, err = optionArg.Value()
@@ -99,11 +99,11 @@ func InitializeNestedOptions(ctx *godog.ScenarioContext) {
 		return utils.Pass
 	})
 
-	ctx.Step(`^the list's length is (\d+)$`, func(len int) error {
+	ctx.Step(`^the nested list's length is (\d+)$`, func(len int) error {
 		return utils.ExpectEqual(utils.CasperT, "length", clOption.Option.Inner.List.Len(), len)
 	})
 
-	ctx.Step(`^the list's "([^"]*)" item is a CLValue with U256 value of (\d+)$`, func(nth string, val int32) error {
+	ctx.Step(`^the nested list's "([^"]*)" item is a CLValue with U256 value of (\d+)$`, func(nth string, val int32) error {
 		index := getNthIndex(nth)
 		clValue := clOption.Option.Inner.List.Elements[index]
 		return utils.ExpectEqual(utils.CasperT, "value", clValue.UI256.Value(), createCLUInt256(val).UI256.Value())
