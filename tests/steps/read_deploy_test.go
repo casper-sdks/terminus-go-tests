@@ -76,7 +76,7 @@ func InitializeReadDeploy(ctx *godog.ScenarioContext) {
 		return utils.ExpectEqual(utils.CasperT, "bodyHash", deploy.Header.BodyHash.String(), bodyHash)
 	})
 
-	ctx.Step(`^the chain name is "([^"]*)"$`, func(chainName string) error {
+	ctx.Step(`^the chain name is  "([^"]*)"$`, func(chainName string) error {
 		return utils.ExpectEqual(utils.CasperT, "bodyHash", deploy.Header.ChainName, chainName)
 	})
 
