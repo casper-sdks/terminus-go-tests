@@ -2,3 +2,6 @@
 assets
 /tests/pkg/mod/
 /reports/
+/tests/contracts
+/tests/features
+/tests/json
