@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/big"
 	"math/rand"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -198,29 +199,43 @@ func InitializeClValues(ctx *godog.ScenarioContext) {
 			return err
 		})
 
-	ctx.Step(`^the deploys NamedArgument Complex value "([^"]*)" has internal types of "([^"]*)" and values of "([^"]*)" and bytes of "([^"]*)"$`,
-		func(name string, internalTypes string, values string, hexBytes string) error {
-			var value clvalue.CLValue
-			var expectedValue *clvalue.CLValue
+	stepFunc := func(name string, internalTypes string, values string, hexBytes string) error {
+		var value clvalue.CLValue
+		var expectedValue *clvalue.CLValue
 
-			args := clValuesInfoGetDeployResult.Deploy.Session.Transfer.Args
-			arg, err := args.Find(name)
-			if err == nil {
-				value, err = arg.Value()
-			}
+		args := clValuesInfoGetDeployResult.Deploy.Session.Transfer.Args
+		arg, err := args.Find(name)
+		if err == nil {
+			value, err = arg.Value()
+		}
 
-			if err == nil {
-				err = utils.ExpectEqual(utils.CasperT, "bytes", hex.EncodeToString(value.Bytes()), hexBytes)
-			}
+		if err == nil {
+			err = utils.ExpectEqual(utils.CasperT, "bytes", hex.EncodeToString(value.Bytes()), hexBytes)
+		}
 
-			if err == nil {
-				expectedValue, err = utils.CreateComplexValue(name, strings.Split(internalTypes, ","), strings.Split(values, ","))
-			}
+		if err == nil {
+			expectedValue, err = utils.CreateComplexValue(name, strings.Split(internalTypes, ","), strings.Split(values, ","))
+		}
 
-			if err == nil {
+		if err == nil {
+			if name == "Map" {
+				for i := 0; i < 3; i++ {
+					// Map do not maintain order so we need to find the value by key
+					key := strconv.FormatInt(int64(i), 10)
+					expected, _ := expectedValue.Map.Find(key)
+					actual, _ := value.Map.Find(key)
+					err = utils.ExpectEqual(utils.CasperT, "value", actual.GetValueByType().String(), expected.GetValueByType().String())
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				err = utils.ExpectEqual(utils.CasperT, "value", value.GetValueByType().String(), expectedValue.GetValueByType().String())
 			}
+		}
 
-			return err
-		})
+		return err
+	}
+	ctx.Step(`^the deploys NamedArgument Complex value "([^"]*)" has internal types of "([^"]*)" and values of "([^"]*)" and bytes of "([^"]*)"$`,
+		stepFunc)
 }

@@ -96,10 +96,10 @@ func CreateValue(typeName string, strValue string) (*clvalue.CLValue, error) {
 	case "URef":
 		uRef := key.URef{}
 		var bytes []byte
-		bytes, err = hex.DecodeString(strValue)
+		bytes, err = hex.DecodeString(strValue + "07")
 		uRef, err = key.NewURefFromBytes(bytes)
 		if err == nil {
-			clvalue.NewCLUref(uRef)
+			clVal = clvalue.NewCLUref(uRef)
 		}
 
 	default:
@@ -134,8 +134,13 @@ func CreateComplexValue(typeName string, innerTypes []string, strValues []string
 
 	case "List":
 		clList := clvalue.NewCLList(innerValues[0].Type)
+
 		for _, innerValue := range innerValues {
-			clList.List.Append(clvalue.NewCLByteArray(innerValue.Bytes()))
+			if innerTypes[0] == "String" {
+				clList.List.Append(innerValue)
+			} else {
+				clList.List.Append(clvalue.NewCLByteArray(innerValue.Bytes()))
+			}
 		}
 		clVal = clList
 
